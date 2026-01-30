@@ -397,9 +397,10 @@ const ProposalEditForm = () => {
     <>
       <style>{`
         @media print {
+          /* Page setup with margins for header/footer */
           @page {
             size: A4;
-            margin: 0mm;
+            margin: 90px 15mm 40px 15mm;
           }
           
           body {
@@ -408,75 +409,76 @@ const ProposalEditForm = () => {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
             color: #000;
-            counter-reset: page;
           }
 
-          /* CUSTOM HEADER THAT APPEARS ON EVERY PAGE */
+          /* CUSTOM HEADER - Fixed at top within page margin */
           .custom-print-header {
             position: fixed;
-            top: 0;
+            top: -15px;
             left: 0;
+            right: 0;
             width: 100%;
-            height: 30px;
+            height: 35px;
             display: grid !important;
             grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            padding: 5px 20px;
-            font-size: 10px;
+            padding: 10px 15mm;
+            font-size: 9px;
             color: #666;
             background-color: white;
             z-index: 9999;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #ddd;
+            box-sizing: border-box;
           }
           
-          /* CUSTOM FOOTER WITH PAGE NUMBER */
+          /* CUSTOM FOOTER - Fixed at bottom within page margin */
           .custom-print-footer {
             position: fixed;
             bottom: 0;
             left: 0;
+            right: 0;
             width: 100%;
-            height: 35px;
+            height: 75px;
             display: flex !important;
-            justify-content: flex-center;
+            justify-content: center;
             align-items: center;
-            padding: 5px 20px;
+            padding: 10px 15mm;
             font-size: 10px;
+            line-height: 1.4;
             color: #666;
             background-color: white;
             z-index: 9999;
-            border-top: 1px solid #eee;
+            border-top: 1px solid #ddd;
+            box-sizing: border-box;
           }
           
+          .custom-print-footer p {
+            margin: 0;
+            text-align: center;
+            max-width: 90%;
+          }
           
-          /* Padding for content so it doesn't overlap with fixed header/footer */
+          /* Main content container - no extra padding needed as @page handles margins */
           .print-content-padding {
-            padding-top: 60px !important; 
-            padding-left: 15mm !important;
-            padding-right: 15mm !important;
-            padding-bottom: 40px !important;
+            padding: 10px 0 10px 0 !important;
+            margin: 0 !important;
+            box-sizing: border-box;
           }
           
+          /* Founder card scaling */
           .founder-card-wrapper {
-            transform: scale(0.6);          
+            transform: scale(0.52);
             transform-origin: top center;
-            height: 750px;                  
+            height: 400px;
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             overflow: visible;
-            margin-bottom: 20px;
+            margin: 10px 0;
           }
 
-          @media print {
-            .founder-card-wrapper {
-              transform: scale(0.52) !important; 
-              height: 400px !important;          
-              margin-bottom: -20px !important;
-              overflow: visible !important;
-            }
-          }
-
+          /* Visibility controls */
           .no-print {
             display: none !important;
           }
@@ -485,6 +487,11 @@ const ProposalEditForm = () => {
             display: block !important;
           }
           
+          .hide-in-print {
+            display: none !important;
+          }
+          
+          /* Page break controls */
           .page-break {
             page-break-after: always;
             page-break-inside: avoid;
@@ -495,13 +502,72 @@ const ProposalEditForm = () => {
             break-inside: avoid;
           }
           
-          table {
+          /* Section spacing - minimal and consistent */
+          section {
+            page-break-inside: auto;
+            break-inside: auto;
+            padding: 8px 0 !important;
+            margin: 0 0 12px 0 !important;
+            position: relative;
+          }
+          
+          section:first-of-type {
+            margin-top: 0 !important;
+          }
+          
+          /* Heading spacing - reduced */
+          h1 {
+            margin: 0 0 10px 0 !important;
+            padding: 0 !important;
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+          
+          h2 {
+            margin: 12px 0 8px 0 !important;
+            padding: 0 !important;
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+          
+          h3 {
+            margin: 10px 0 6px 0 !important;
+            padding: 0 !important;
+            page-break-after: avoid;
+            break-after: avoid;
+          }
+          
+          /* Div and container spacing */
+          div {
+            page-break-inside: auto;
+          }
+          
+          /* Warning/info boxes */
+          .bg-yellow-50,
+          .bg-red-50,
+          .bg-green-50,
+          .bg-blue-50 {
+            margin: 8px 0 !important;
+            padding: 8px 12px !important;
             page-break-inside: avoid;
-            break-inside: avoid;
+          }
+          
+          /* Table styling */
+          table {
+            page-break-inside: auto;
+            break-inside: auto;
+            margin: 10px 0 !important;
+            width: 100% !important;
+            border-collapse: collapse !important;
           }
           
           thead {
             display: table-header-group;
+            break-after: avoid;
+          }
+          
+          tbody {
+            page-break-inside: auto;
           }
           
           tr {
@@ -509,14 +575,12 @@ const ProposalEditForm = () => {
             break-inside: avoid;
           }
           
-          section {
-            page-break-inside: avoid;
-            break-inside: avoid;
-            padding-top: 40px !important; 
-            margin-top: 0 !important;
-            position: relative;
+          th, td {
+            padding: 6px 8px !important;
+            text-align: left;
           }
           
+          /* Form elements in print */
           input, select, button {
             border: none !important;
             background: transparent !important;
@@ -527,16 +591,7 @@ const ProposalEditForm = () => {
             font-size: inherit !important;
           }
           
-          .hide-in-print {
-            display: none !important;
-          }
-          
-          * {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            color-adjust: exact;
-          }
-          
+          /* Remove shadows and rounded corners */
           .shadow-lg,
           .rounded-lg,
           .rounded-t-lg,
@@ -545,19 +600,28 @@ const ProposalEditForm = () => {
             border-radius: 0 !important;
           }
           
+          /* Container adjustments */
           .max-w-7xl {
             max-width: 100% !important;
             padding: 0 !important;
           }
           
-          table {
-            width: 100% !important;
-            border-collapse: collapse !important;
+          /* Grid spacing */
+          .grid {
+            gap: 12px !important;
           }
           
-          th, td {
-            padding: 8px !important;
-            text-align: left;
+          .space-y-8 > * + *,
+          .space-y-6 > * + *,
+          .space-y-4 > * + * {
+            margin-top: 10px !important;
+          }
+          
+          /* Ensure color accuracy */
+          * {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+            color-adjust: exact;
           }
         }
         
@@ -1133,7 +1197,7 @@ const ProposalEditForm = () => {
               </div>
 
               {/* Absolute Returns Table */}
-              <h3 className="text-lg font-semibold text-gray-700 mb-2">
+              <h3 className="text-lg font-semibold text-gray-700 mb-2 p-2">
                 Absolute/CAGR Returns (Past Performance)
               </h3>
               <div className="overflow-x-auto avoid-break space-y-2">
@@ -1227,7 +1291,7 @@ const ProposalEditForm = () => {
 
               {/* CAGR Returns Table */}
 
-              <div className="overflow-x-auto avoid-break mb-6">
+              <div className="overflow-x-auto avoid-break mb-6 p-4">
                 <table className="w-full border-2 border-gray-300 rounded-lg text-sm avoid-break mb-4">
                   <thead>
                     <tr style={{ backgroundColor: "#ecf4e4" }}>
@@ -1485,7 +1549,7 @@ const ProposalEditForm = () => {
             {/* Section 6: Advisor Information with Founder Card */}
             <section className="page-break avoid-break">
               <h2
-                className="text-2xl font-bold mb-4"
+                className="text-2xl font-bold mb-4 p-4"
                 style={{ color: "#73b030" }}
               >
                 Distributor Information
