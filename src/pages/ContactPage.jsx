@@ -55,8 +55,11 @@ const ContactPage = () => {
       
       <div className="grid md:grid-cols-2 gap-12">
         <div className="bg-white p-8 rounded-xl shadow-lg border-t-4 border-dark-green h-full flex flex-col">
-          <h3 className="text-3xl font-bold mb-6 text-slate-800">Contact Information</h3>
+          <h3 className="text-2xl font-bold mb-6 text-slate-800">Contact Information</h3>
          <div className="space-y-6 flex-grow">
+            <div className="flex justify-left">
+              <img src={founderImg} alt={BRAND.founder} className="w-45 h-45 object-cover rounded-lg shadow-md"/>
+            </div>
             <div className="flex items-start gap-4">
               <div className="bg-light-cream p-3 rounded-full">
                 <User className="text-dark-green w-6 h-6" />
@@ -93,9 +96,6 @@ const ContactPage = () => {
                 <p className="text-slate-600">{BRAND.address}</p>
               </div>
             </div>
-          </div>
-          <div className="flex justify-center items-center">
-            <img src={founderImg} alt={BRAND.founder} className="w-45 h-45 object-cover rounded-lg shadow-md"/>
           </div>
 
           <div className="pt-8 mt-auto">
