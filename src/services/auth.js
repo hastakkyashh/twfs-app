@@ -1,11 +1,7 @@
 /**
  * Frontend Authentication Service
- * Simple authentication without JWT or backend
- * Credentials stored in environment variables
+ * Uses Cloudflare Pages Functions for secure server-side authentication
  */
-
-const ADMIN_USERNAME = import.meta.env.VITE_ADMIN_USERNAME;
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD;
 
 // Session storage key
 const SESSION_KEY = 'finsure_auth_session';
@@ -18,41 +14,40 @@ const SESSION_KEY = 'finsure_auth_session';
  */
 export const login = async (username, password) => {
   try {
-    // Check if credentials are configured
-    if (!ADMIN_USERNAME || !ADMIN_PASSWORD) {
-      console.error('Admin credentials not configured in environment variables');
-      return { 
-        success: false, 
-        error: 'Admin credentials not configured. Please check .env file.' 
-      };
-    }
+    // Call Cloudflare Pages Function (server-side)
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ username, password })
+    });
 
-    // Validate credentials
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Create session object
-      const session = {
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      // Store token in localStorage
+      localStorage.setItem(SESSION_KEY, JSON.stringify({
+        token: data.token,
         username,
         role: 'admin',
         loginTime: new Date().toISOString()
-      };
-
-      // Store session in localStorage
-      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      }));
 
       console.log('Login successful for user:', username);
       return { success: true };
     }
 
-    console.log('Login failed: Invalid credentials');
+    console.log('Login failed:', data.error);
     return { 
       success: false, 
-      error: 'Invalid credentials' 
+      error: data.error || 'Invalid credentials' 
     };
   } catch (error) {
     console.error('Login error:', error);
     return { 
       success: false, 
-      error: 'An error occurred during login' 
+      error: 'Cannot connect to authentication server' 
     };
   }
 };
@@ -71,17 +66,30 @@ export const verifyAuth = async () => {
 
     const session = JSON.parse(sessionData);
     
-    // Basic validation - check if session exists and has required fields
-    if (session && session.username && session.role) {
-      return { 
-        valid: true, 
-        user: {
-          username: session.username,
-          role: session.role
-        }
-      };
+    if (!session || !session.token) {
+      return { valid: false };
     }
 
+    // Verify token with server
+    const response = await fetch('/api/auth/verify', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${session.token}`
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.valid) {
+        return { 
+          valid: true, 
+          user: data.user
+        };
+      }
+    }
+
+    // Token invalid, clear session
+    localStorage.removeItem(SESSION_KEY);
     return { valid: false };
   } catch (error) {
     console.error('Auth verification error:', error);
