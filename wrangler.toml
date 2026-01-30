@@ -1,0 +1,6 @@
+name = "twfs-spa"
+compatibility_date = "2026-01-30"
+pages_build_output_dir = "./dist"
+
+[env.production]
+compatibility_date = "2026-01-30"
