@@ -3,6 +3,7 @@ import { User, Phone, Mail, Send, MapPin } from 'lucide-react';
 import { SectionTitle } from '../components/ui';
 import { BRAND } from '../constants/brand';
 import { SERVICES } from '../constants/services';
+import founderImg from "../assets/YH_pic.png";
 
 const ContactPage = () => {
   const [formData, setFormData] = useState({
@@ -92,6 +93,9 @@ const ContactPage = () => {
                 <p className="text-slate-600">{BRAND.address}</p>
               </div>
             </div>
+          </div>
+          <div className="flex justify-center items-center">
+            <img src={founderImg} alt={BRAND.founder} className="w-45 h-45 object-cover rounded-lg shadow-md"/>
           </div>
 
           <div className="pt-8 mt-auto">
