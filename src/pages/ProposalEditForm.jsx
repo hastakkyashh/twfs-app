@@ -399,10 +399,7 @@ const ProposalEditForm = () => {
         @media print {
           @page {
             size: A4;
-            margin-top: 25mm;
-            margin-bottom: 25mm;
-            margin-left: 10mm;
-            margin-right: 10mm;
+            margin: 0mm;
           }
           
           body {
@@ -417,14 +414,14 @@ const ProposalEditForm = () => {
           /* CUSTOM HEADER THAT APPEARS ON EVERY PAGE */
           .custom-print-header {
             position: fixed;
-            top: -20mm;
+            top: 0;
             left: 0;
             width: 100%;
             height: 30px;
             display: grid !important;
             grid-template-columns: 1fr auto 1fr;
             align-items: center;
-            padding: 0 10mm;
+            padding: 5px 20px;
             font-size: 10px;
             color: #666;
             background-color: white;
@@ -435,21 +432,30 @@ const ProposalEditForm = () => {
           /* CUSTOM FOOTER WITH PAGE NUMBER */
           .custom-print-footer {
             position: fixed;
-            bottom: -10mm;
+            bottom: 0;
             left: 0;
             width: 100%;
-            height: 35px;
+            height: 30px;
             display: flex !important;
             justify-content: flex-center;
             align-items: center;
-            padding: 0 10mm;
-            font-size: 8px;
+            padding: 5px 20px;
+            font-size: 10px;
             color: #666;
             background-color: white;
             z-index: 9999;
             border-top: 1px solid #eee;
           }
-                    
+          
+          
+          /* Padding for content so it doesn't overlap with fixed header/footer */
+          .print-content-padding {
+            padding-top: 60px !important; 
+            padding-left: 15mm !important;
+            padding-right: 15mm !important;
+            padding-bottom: 40px !important;
+          }
+          
           .founder-card-wrapper {
             transform: scale(0.6);          
             transform-origin: top center;
