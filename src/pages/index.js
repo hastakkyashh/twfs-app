@@ -1,0 +1,10 @@
+export { default as HomePage } from './HomePage';
+export { default as AboutPage } from './AboutPage';
+export { default as ServicesPage } from './ServicesPage';
+export { default as EducationPage } from './EducationPage';
+export { default as ContactPage } from './ContactPage';
+export { default as AIAssistantPage } from './AIAssistantPage';
+export { default as CalculatorHub } from './CalculatorHub';
+export { default as PrivacyPolicyPage } from './PrivacyPolicyPage';
+export { default as TermsConditionsPage } from './TermsConditionsPage';
+export { default as DisclosurePage } from './DisclosurePage';

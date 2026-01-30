@@ -1,0 +1,58 @@
+# ============================================
+# BACKEND DOCKERFILE (Express API Server)
+# ============================================
+
+# Use Node.js 20 Alpine (lightweight Linux distribution)
+# Reason: Alpine is ~5MB vs ~900MB for full Node image, reducing container size
+FROM node:20-alpine
+
+# Set working directory for backend
+# Reason: All backend code will be in /app directory inside container
+WORKDIR /app
+
+# Copy backend package files
+# Reason: Install dependencies first to leverage Docker cache
+# If package.json doesn't change, this layer is reused on rebuilds
+COPY server/package*.json ./
+
+# Install production dependencies only
+# Reason: --only=production skips devDependencies, reducing image size
+# npm ci ensures reproducible builds using exact versions from package-lock.json
+RUN npm ci --only=production
+
+# Copy backend source code
+# Reason: Copy application code after dependencies to optimize cache usage
+COPY server/ ./
+
+# Create a non-root user for security
+# Reason: Running as root inside container is a security risk
+# If container is compromised, attacker has limited privileges
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Change ownership of app files to non-root user
+# Reason: The nodejs user needs permission to read application files
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+# Reason: All subsequent commands and the app will run as this user
+USER nodejs
+
+# Expose port 3001 (backend API port)
+# Reason: Documents that the Express server listens on port 3001
+# Must match PORT in server/index.js
+EXPOSE 3001
+
+# Set environment to production
+# Reason: Optimizes Node.js performance and disables development features
+ENV NODE_ENV=production
+
+# Health check to monitor container health
+# Reason: Docker/orchestrators can automatically restart unhealthy containers
+# Checks /health endpoint every 30 seconds
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start the Express server
+# Reason: node index.js runs the backend API server
+CMD ["node", "index.js"]

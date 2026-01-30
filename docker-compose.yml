@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  # -------------------- BACKEND SERVICE --------------------
+  # Purpose: Express API server for Yahoo Finance integration and authentication
+  backend:
+    # Build configuration
+    # Reason: Specifies which Dockerfile to use and build context
+    build:
+      context: .                    # Build context is root directory (has access to server/ folder)
+      dockerfile: Dockerfile.backend # Use backend-specific Dockerfile
+    
+    # Container name for easy identification
+    # Reason: Makes it easier to reference container in logs and commands
+    container_name: finsure-backend
+    
+    # Port mapping: host:container
+    # Reason: Maps port 3001 on your host to port 3001 in container
+    # Backend API will be accessible at http://localhost:3001
+    ports:
+      - "3001:3001"
+    
+    # Restart policy
+    # Reason: Automatically restart container if it crashes (unless manually stopped)
+    # Critical for production reliability
+    restart: unless-stopped
+    
+    # Resource limits for e2-micro (1GB RAM + 2GB swap)
+    # Reason: Prevents backend from consuming all available memory
+    # Ensures predictable behavior and prevents OOM killer
+    deploy:
+      resources:
+        limits:
+          memory: 400M              # Backend gets max 400MB
+        reservations:
+          memory: 200M              # Reserve minimum 200MB
+    
+    # Environment variables
+    # Reason: Configure runtime behavior of the backend
+    environment:
+      - NODE_ENV=production          # Optimizes Node.js for production
+      - PORT=3001                    # Backend listens on port 3001
+      # Add your secrets here or use .env file:
+      # - JWT_SECRET=${JWT_SECRET}
+      # - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    
+    # Environment file (optional)
+    # Reason: Load sensitive data from .env file instead of hardcoding
+    # Create .env file with JWT_SECRET, ADMIN_PASSWORD, etc.
+    env_file:
+      - .env                         
+    
+    # Network configuration
+    # Reason: Both services on same network can communicate using service names
+    networks:
+      - finsure-network
+    
+    # Health check
+    # Reason: Docker monitors backend health and can restart if unhealthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s                  # Check every 30 seconds
+      timeout: 3s                    # Fail if check takes > 3 seconds
+      retries: 3                     # Mark unhealthy after 3 failed checks
+      start_period: 10s              # Grace period for startup
+
+  # -------------------- FRONTEND SERVICE --------------------
+  # Purpose: Nginx serving React SPA (Single Page Application)
+  frontend:
+    # Build configuration
+    # Reason: Specifies which Dockerfile to use for frontend
+    build:
+      context: .                     # Build context is root (has access to src/ folder)
+      dockerfile: Dockerfile.frontend # Use frontend-specific Dockerfile
+      args:
+        # Pass environment variables from .env file as build arguments
+        # These will be embedded in the frontend bundle during build
+        VITE_GEMINI_API_KEY: ${VITE_GEMINI_API_KEY}
+        VITE_GEMINI_API_URL: ${VITE_GEMINI_API_URL}
+        VITE_API_URL: ${VITE_API_URL}
+    
+    # Container name
+    container_name: finsure-frontend
+    
+    # Port mapping: host:container
+    # Reason: Maps port 80 on your host to port 80 in container
+    # Frontend will be accessible at http://localhost
+    ports:
+      - "80:80"
+    
+    # Restart policy
+    restart: unless-stopped
+    
+    # Resource limits for e2-micro (1GB RAM + 2GB swap)
+    # Reason: Nginx is lightweight, needs less memory than Node.js
+    # Prevents frontend from consuming excessive memory
+    deploy:
+      resources:
+        limits:
+          memory: 300M              # Frontend gets max 300MB
+        reservations:
+          memory: 150M              # Reserve minimum 150MB
+    
+    # Dependency management
+    # Reason: Ensures backend starts before frontend
+    # Frontend may need to call backend API on load
+    depends_on:
+      backend:
+        condition: service_healthy   # Wait for backend to be healthy before starting
+    
+    # Environment variables
+    # Reason: Configure frontend behavior (though React build is static)
+    # Note: VITE_* variables must be set at BUILD time, not runtime
+    # They are embedded in the static bundle during 'npm run build'
+    environment:
+      - NODE_ENV=production
+    
+    # Network configuration
+    # Reason: Frontend can communicate with backend using http://backend:3001
+    networks:
+      - finsure-network
+    
+    # Health check
+    # Reason: Verify Nginx is serving files correctly
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+# -------------------- NETWORKS --------------------
+# Purpose: Create isolated network for service-to-service communication
+networks:
+  finsure-network:
+    driver: bridge                   # Bridge driver allows containers to communicate
+    # Reason: Containers can reference each other by service name (e.g., http://backend:3001)

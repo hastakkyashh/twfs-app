@@ -1,0 +1,95 @@
+# ============================================
+# DOCKERIGNORE FILE
+# Purpose: Exclude files from Docker build context
+# Reason: Reduces build time and image size by not copying unnecessary files
+# ============================================
+
+# -------------------- Dependencies --------------------
+# Reason: node_modules will be installed fresh in container
+# Copying local node_modules would be wasteful and may cause platform issues
+node_modules
+**/node_modules
+
+# -------------------- Build Artifacts --------------------
+# Reason: dist folder is generated during Docker build
+# No need to copy existing build artifacts
+dist
+build
+**/dist
+**/build
+
+# -------------------- Git Files --------------------
+# Reason: Git history is not needed in production container
+# Reduces image size significantly
+.git
+.gitignore
+.gitattributes
+
+# -------------------- Documentation --------------------
+# Reason: README and other markdown files aren't needed at runtime
+# Keeps image lean
+*.md
+README.md
+readmes/
+
+# -------------------- Environment Files --------------------
+# Reason: Sensitive data should not be in image
+# Use docker-compose environment variables instead
+.env
+.env.*
+.env.local
+.env.production
+.env.development
+
+# -------------------- IDE & Editor Files --------------------
+# Reason: IDE configurations are developer-specific
+# Not needed in production container
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.editorconfig
+
+# -------------------- Logs --------------------
+# Reason: Old logs shouldn't be copied into fresh container
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+logs
+
+# -------------------- OS Files --------------------
+# Reason: OS-specific files can cause issues across platforms
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# -------------------- Testing & Coverage --------------------
+# Reason: Test files and coverage reports aren't needed in production
+coverage
+.nyc_output
+*.test.js
+*.spec.js
+__tests__
+test
+
+# -------------------- Linting & Formatting --------------------
+# Reason: Linting cache is development-only
+.eslintcache
+.prettierrc
+.prettierignore
+
+# -------------------- Docker Files --------------------
+# Reason: Don't need Docker files inside the Docker image
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# -------------------- CI/CD --------------------
+# Reason: CI/CD configs aren't needed in production container
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
