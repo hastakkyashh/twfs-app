@@ -177,11 +177,12 @@ export const calculateProjections = (formData, customStrategies = null) => {
 };
 
 export const formatCurrency = (value) => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
+  const formattedNumber = new Intl.NumberFormat('en-IN', {
+    style: 'decimal',
     maximumFractionDigits: 0
   }).format(value);
+
+  return `Rs. ${formattedNumber}`;
 };
 
 export const formatNumber = (value) => {

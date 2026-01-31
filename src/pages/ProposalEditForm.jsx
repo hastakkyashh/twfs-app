@@ -10,9 +10,11 @@ import {
   generateYearMilestones,
 } from "../components/ProposalWizard/utils/calculations";
 import FundSearchBar from "../components/FundSearch/FundSearchBar";
-import { Trash2, Plus, Download } from "lucide-react";
+import { Trash2, Plus, Download, Loader2 } from "lucide-react";
 import { FounderCard } from "../components/ui";
 import { BRAND } from "../constants/brand";
+import { pdf } from "@react-pdf/renderer";
+import { ProposalPDFDocument } from "../components/ProposalPDF";
 
 const ProposalEditForm = () => {
   const [formData, setFormData] = useState(null);
@@ -20,6 +22,7 @@ const ProposalEditForm = () => {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [editableStrategy, setEditableStrategy] = useState(null);
   const [editableProjections, setEditableProjections] = useState(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   // Set document title for print job name
   useEffect(() => {
@@ -360,14 +363,52 @@ const ProposalEditForm = () => {
     );
   };
 
-  const handlePrintPDF = () => {
+  const handlePrintPDF = async () => {
     if (portfolioFunds.length === 0) {
       alert(
         "Please add at least one fund to the portfolio before generating PDF.",
       );
       return;
     }
-    window.print();
+    
+    setIsGeneratingPDF(true);
+    
+    try {
+      const riskAppetiteValue = getRiskAppetite(formData.horizon);
+      const strategyDetailsValue = editableStrategy || formData.selectedStrategyDetails;
+      const selectedProjectionValue = editableProjections
+        ? { projections: editableProjections }
+        : formData.selectedProjectionData;
+      const totalAllocationValue = getTotalAllocation();
+
+      const pdfDoc = (
+        <ProposalPDFDocument
+          formData={formData}
+          portfolioFunds={portfolioFunds}
+          strategyDetails={strategyDetailsValue}
+          selectedProjection={selectedProjectionValue}
+          proposalId={proposalId}
+          proposalDate={proposalDate}
+          riskAppetite={riskAppetiteValue}
+          totalAllocation={totalAllocationValue}
+        />
+      );
+
+      const blob = await pdf(pdfDoc).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${proposalId}_${formData.clientName || "Proposal"}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      alert("Error generating PDF. Please try again.");
+    } finally {
+      setIsGeneratingPDF(false);
+    }
   };
 
   if (!formData) {
@@ -680,17 +721,27 @@ const ProposalEditForm = () => {
               </button>
               <button
                 onClick={handlePrintPDF}
-                className="px-6 py-2 text-white rounded-lg font-semibold transition-colors flex items-center gap-2"
+                disabled={isGeneratingPDF}
+                className="px-6 py-2 text-white rounded-lg font-semibold transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: "#73b030" }}
                 onMouseEnter={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#337b1c")
+                  !isGeneratingPDF && (e.currentTarget.style.backgroundColor = "#337b1c")
                 }
                 onMouseLeave={(e) =>
-                  (e.currentTarget.style.backgroundColor = "#73b030")
+                  !isGeneratingPDF && (e.currentTarget.style.backgroundColor = "#73b030")
                 }
               >
-                <Download size={18} />
-                Download PDF
+                {isGeneratingPDF ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Download size={18} />
+                    Download PDF
+                  </>
+                )}
               </button>
             </div>
           </div>
