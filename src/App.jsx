@@ -10,7 +10,9 @@ import {
   CalculatorHub,
   PrivacyPolicyPage,
   TermsConditionsPage,
-  DisclosurePage
+  DisclosurePage,
+  BlogsPage,
+  BlogDetailPage
 } from './pages';
 import ProposalWizard from './components/ProposalWizard';
 import ProposalEditForm from './pages/ProposalEditForm';
@@ -80,10 +82,17 @@ const App = () => {
       case 'pension-calculator': return <PensionCalculator />;
       case 'bmi-calculator': return <BMICalculator />;
       case 'contact': return <ContactPage />;
+      case 'blogs': return <BlogsPage navigate={setCurrentPage} />;
       case 'privacy-policy': return <PrivacyPolicyPage />;
       case 'terms-conditions': return <TermsConditionsPage />;
       case 'disclosure': return <DisclosurePage />;
-      default: return <HomePage navigate={setCurrentPage} />;
+      default: {
+        if (currentPage.startsWith('blog-detail-')) {
+          const blogId = currentPage.replace('blog-detail-', '');
+          return <BlogDetailPage navigate={setCurrentPage} blogId={blogId} />;
+        }
+        return <HomePage navigate={setCurrentPage} />;
+      }
     }
   };
 

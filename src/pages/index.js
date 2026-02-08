@@ -8,3 +8,5 @@ export { default as CalculatorHub } from './CalculatorHub';
 export { default as PrivacyPolicyPage } from './PrivacyPolicyPage';
 export { default as TermsConditionsPage } from './TermsConditionsPage';
 export { default as DisclosurePage } from './DisclosurePage';
+export { default as BlogsPage } from './BlogsPage';
+export { default as BlogDetailPage } from './BlogDetailPage';
