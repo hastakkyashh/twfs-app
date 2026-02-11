@@ -3,9 +3,21 @@
  * This runs server-side and keeps credentials secure
  */
 
+/**
+ * Hash a string using SHA-256 via Web Crypto API
+ * @param {string} message
+ * @returns {Promise<string>} hex-encoded hash
+ */
+async function sha256(message) {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 export async function onRequestPost(context) {
   try {
-    const { username, password } = await context.request.json();
+    const { username, password_hash } = await context.request.json();
     
     // Access environment variables securely (not exposed to client)
     const ADMIN_USERNAME = context.env.ADMIN_USERNAME;
@@ -18,8 +30,11 @@ export async function onRequestPost(context) {
       );
     }
 
-    // Verify credentials
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+    // Hash the stored password server-side for comparison
+    const serverPasswordHash = await sha256(ADMIN_PASSWORD);
+
+    // Compare client hash vs server computed hash
+    if (username === ADMIN_USERNAME && password_hash === serverPasswordHash) {
       // Create a simple session token (you could use JWT here)
       const sessionToken = btoa(`${username}:${Date.now()}`);
       

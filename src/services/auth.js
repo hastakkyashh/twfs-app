@@ -7,6 +7,18 @@
 const SESSION_KEY = 'finsure_auth_session';
 
 /**
+ * Hash a string using SHA-256 via Web Crypto API
+ * @param {string} message
+ * @returns {Promise<string>} hex-encoded hash
+ */
+const sha256 = async (message) => {
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+};
+
+/**
  * Login with username and password
  * @param {string} username 
  * @param {string} password 
@@ -20,7 +32,7 @@ export const login = async (username, password) => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ username, password })
+      body: JSON.stringify({ username, password_hash: await sha256(password) })
     });
 
     const data = await response.json();
