@@ -1,4 +1,4 @@
-name = "twfs-spa"
+name = "twfs-app"
 compatibility_date = "2026-01-30"
 pages_build_output_dir = "./dist"
 

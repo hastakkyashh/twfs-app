@@ -41,7 +41,7 @@ export async function onRequestPost(context) {
     const db = context.env.twfs_telemetry;
 
     const result = await db.prepare(`
-      INSERT INTO form_submissions 
+      INSERT INTO enquiry_form_submissions 
         (name, dob, place, phone, email, service, 
          cf_country, cf_city, cf_region, cf_latitude, cf_longitude, cf_timezone,
          browser_latitude, browser_longitude, user_agent, submitted_at)

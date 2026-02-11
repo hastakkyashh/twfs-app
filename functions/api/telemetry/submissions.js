@@ -49,14 +49,14 @@ export async function onRequestGet(context) {
 
     // Fetch submissions
     const { results } = await db.prepare(`
-      SELECT * FROM form_submissions 
+      SELECT * FROM enquiry_form_submissions 
       ORDER BY submitted_at DESC 
       LIMIT ? OFFSET ?
     `).bind(limit, offset).all();
 
     // Get total count
     const countResult = await db.prepare(
-      'SELECT COUNT(*) as total FROM form_submissions'
+      'SELECT COUNT(*) as total FROM enquiry_form_submissions'
     ).first();
 
     return new Response(
