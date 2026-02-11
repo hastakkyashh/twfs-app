@@ -33,6 +33,7 @@ import {
   PensionCalculator,
   BMICalculator
 } from './pages/calculators';
+import ReactGA from "react-ga4";
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -53,6 +54,16 @@ const App = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+  }, [currentPage]);
+
+  useEffect(() => {
+    const pagePath = `/${currentPage}`;
+    
+    ReactGA.send({ 
+      hitType: "pageview", 
+      page: pagePath, 
+      title: currentPage.charAt(0).toUpperCase() + currentPage.slice(1) 
+    });
   }, [currentPage]);
 
   const renderPage = () => {
