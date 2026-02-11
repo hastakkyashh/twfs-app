@@ -10,5 +10,3 @@ binding = "twfs_telemetry"
 database_name = "twfs-telemetry"
 database_id = "5a49fed9-9aa7-4b12-82b5-280e18987a29"
 
-[env.production]
-compatibility_date = "2026-01-30"
