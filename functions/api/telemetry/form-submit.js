@@ -71,11 +71,7 @@ export async function onRequestPost(context) {
   } catch (error) {
     console.error('Telemetry form-submit error:', error);
     return new Response(
-      JSON.stringify({ 
-        error: 'Failed to store submission', 
-        debug: error.message, 
-        hasDb: !!context.env.twfs_telemetry 
-      }),
+      JSON.stringify({ error: 'Failed to store submission' }),
       { status: 500, headers: corsHeaders }
     );
   }
