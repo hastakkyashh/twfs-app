@@ -2,5 +2,13 @@ name = "twfs-spa"
 compatibility_date = "2026-01-30"
 pages_build_output_dir = "./dist"
 
+# D1 Database for telemetry (form submissions)
+# Create the database first: npx wrangler d1 create twfs-telemetry
+# Then replace YOUR_DATABASE_ID_HERE with the actual ID from the output
+[[d1_databases]]
+binding = "twfs_telemetry"
+database_name = "twfs-telemetry"
+database_id = "5a49fed9-9aa7-4b12-82b5-280e18987a29"
+
 [env.production]
 compatibility_date = "2026-01-30"

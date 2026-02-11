@@ -14,6 +14,39 @@ const ContactPage = () => {
     email: '',
     service: ''
   });
+  const [browserLocation, setBrowserLocation] = useState(null);
+
+  // Attempt to get browser location once (silent, no blocking)
+  useState(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setBrowserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {} // silently ignore denial
+      );
+    }
+  });
+
+  const logFormSubmission = (data) => {
+    const payload = JSON.stringify({
+      ...data,
+      browser_latitude: browserLocation?.lat || null,
+      browser_longitude: browserLocation?.lng || null,
+    });
+
+    // sendBeacon is fire-and-forget — survives page navigation/tab switch
+    if (navigator.sendBeacon) {
+      const blob = new Blob([payload], { type: 'application/json' });
+      navigator.sendBeacon('/api/telemetry/form-submit', blob);
+    } else {
+      // Fallback for older browsers
+      fetch('/api/telemetry/form-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload,
+        keepalive: true,
+      }).catch(() => {});
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,6 +69,9 @@ const ContactPage = () => {
       alert("Please enter a valid email address.");
       return;
     }
+
+    // Log form data to worker BEFORE WhatsApp redirect
+    logFormSubmission(formData);
 
     const message = `*New Consultation Request* %0a%0a` +
       `*Name:* ${formData.name}%0a` +

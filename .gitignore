@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 .env
 .env.local
+
+# Wrangler local dev state (D1 local DB, etc.)
+.wrangler/
