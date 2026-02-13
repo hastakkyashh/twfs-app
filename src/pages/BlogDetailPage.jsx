@@ -76,13 +76,39 @@ const BlogDetailPage = ({ navigate, blogId }) => {
       <section className="py-12 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
           <div 
-            className="prose prose-lg max-w-none
-              prose-headings:text-slate-900 prose-headings:font-bold
-              prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4 prose-h2:text-dark-green
-              prose-p:text-slate-700 prose-p:leading-relaxed prose-p:mb-4
-              prose-ul:my-4 prose-ul:list-disc prose-ul:pl-6
-              prose-li:text-slate-700 prose-li:mb-2
-              prose-strong:text-slate-900 prose-strong:font-semibold"
+            className="
+            /* Base text styles */
+            text-slate-700 text-lg leading-relaxed max-w-none
+            
+            /* Target ALL <h1> tags inside the JSON content */
+            [&_h1]:text-3xl [&_h1]:font-bold [&_h1]:text-slate-900 [&_h1]:mb-6
+    
+            /* Target ALL <h2> tags (e.g., '5 Red Flags...') */
+            [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-dark-green [&_h2]:mt-10 [&_h2]:mb-4
+    
+            /* Target ALL <h3> tags */
+            [&_h3]:text-xl [&_h3]:font-semibold [&_h3]:text-slate-800 [&_h3]:mt-8 [&_h3]:mb-3
+
+            /* Target Paragraphs <p> */
+            [&_p]:mb-5
+    
+            /* Target Unordered Lists <ul> (fix missing bullets) */
+            [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-6
+    
+            /* Target Ordered Lists <ol> */
+            [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-6
+    
+            /* Target List Items <li> */
+            [&_li]:mb-2 [&_li]:pl-1
+    
+            /* Target Strong/Bold text <strong> */
+            [&_strong]:font-bold [&_strong]:text-slate-900
+    
+            /* Target Tables (if any) */
+            [&_table]:w-full [&_table]:border-collapse [&_table]:my-6
+            [&_th]:bg-slate-100 [&_th]:p-3 [&_th]:text-left [&_th]:font-bold [&_th]:border [&_th]:border-slate-200
+            [&_td]:p-3 [&_td]:border [&_td]:border-slate-200
+            "
             dangerouslySetInnerHTML={{ __html: blog.content }}
           />
           

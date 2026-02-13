@@ -93,7 +93,7 @@ const App = () => {
       case 'pension-calculator': return <PensionCalculator />;
       case 'bmi-calculator': return <BMICalculator />;
       case 'contact': return <ContactPage />;
-      // case 'blogs': return <BlogsPage navigate={setCurrentPage} />;
+      case 'blogs': return <BlogsPage navigate={setCurrentPage} />;
       case 'privacy-policy': return <PrivacyPolicyPage />;
       case 'terms-conditions': return <TermsConditionsPage />;
       case 'disclosure': return <DisclosurePage />;
