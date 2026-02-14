@@ -45,6 +45,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("home")}
                 className="hover:text-brand-orange"
+                data-track="footer-nav-home"
               >
                 Home
               </button>
@@ -53,6 +54,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("about")}
                 className="hover:text-brand-orange"
+                data-track="footer-nav-about"
               >
                 About Us
               </button>
@@ -61,6 +63,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("services")}
                 className="hover:text-brand-orange"
+                data-track="footer-nav-services"
               >
                 Our Services
               </button>
@@ -69,6 +72,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("calculator")}
                 className="hover:text-brand-orange"
+                data-track="footer-nav-calculator"
               >
                 Financial Calculators
               </button>
@@ -77,6 +81,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("ai-advisor")}
                 className="hover:text-brand-orange"
+                data-track="footer-nav-ai-advisor"
               >
                 Kubera AI
               </button>
@@ -85,6 +90,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("contact")}
                 className="hover:text-brand-orange"
+                data-track="footer-nav-contact"
               >
                 Contact Us
               </button>
@@ -140,6 +146,7 @@ const Footer = ({ setCurrentPage }) => {
                 rel="noopener noreferrer"
                 className="hover:text-brand-orange transition-colors cursor-pointer"
                 title={`Visit our ${link.label}`}
+                data-track={`footer-social-${link.label.toLowerCase()}`}
               >
                 <link.icon size={20} />
               </a>

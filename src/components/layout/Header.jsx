@@ -30,22 +30,22 @@ const Header = ({ currentPage, setCurrentPage }) => {
       <div className="bg-dark-green text-light-cream text-xs py-2 px-6 hidden md:block">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex gap-3 items-center">
-            <a href={BRAND.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Instagram">
+            <a href={BRAND.instagram} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Instagram" data-track="header-social-instagram">
               <FaInstagram size={14} />
             </a>
-            <a href={BRAND.X} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="X">
+            <a href={BRAND.X} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="X" data-track="header-social-x">
               <FaXTwitter size={14} />
             </a>
-            <a href={BRAND.Facebook} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Facebook">
+            <a href={BRAND.Facebook} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Facebook" data-track="header-social-facebook">
               <FaFacebook size={14} />
             </a>
-            <a href={`https://wa.me/91${BRAND.phone}`} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="WhatsApp">
+            <a href={`https://wa.me/91${BRAND.phone}`} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="WhatsApp" data-track="header-social-whatsapp">
               <FaWhatsapp size={14} />
             </a>
-            <a href={BRAND.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Telegram">
+            <a href={BRAND.telegram} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Telegram" data-track="header-social-telegram">
               <FaTelegram size={14} />
             </a>
-            <a href={BRAND.threads} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Threads">
+            <a href={BRAND.threads} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Threads" data-track="header-social-threads">
               <FaThreads size={14} />
             </a>
           </div>
@@ -84,6 +84,7 @@ const Header = ({ currentPage, setCurrentPage }) => {
             <button 
               onClick={handleCallNow}
               className="bg-dark-green text-white px-5 py-2 rounded-full text-sm font-bold hover:bg-primary-green transition-colors"
+              data-track="header-cta-call-now"
             >
               Call Now
             </button>

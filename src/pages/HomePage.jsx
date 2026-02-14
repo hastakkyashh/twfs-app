@@ -35,13 +35,13 @@ const HomePage = ({ navigate }) => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Button onClick={() => {
-              window.open('http://p.njw.bz/97660', '_blank')}} variant="secondary">
+              window.open('http://p.njw.bz/97660', '_blank')}} variant="secondary" data-track="hero-cta-invest-now">
               Invest Now
             </Button>
-            <Button onClick={() => {window.open('https://www.pbpartners.com/v2/partner/truewise-finsure-nagpur-Tfr', '_blank')}} variant="secondary">
+            <Button onClick={() => {window.open('https://www.pbpartners.com/v2/partner/truewise-finsure-nagpur-Tfr', '_blank')}} variant="secondary" data-track="hero-cta-insure-now">
               Insure Now
             </Button>
-            <Button onClick={() => navigate('ai-advisor')} variant="outline" className="border-white text-white hover:bg-white hover:text-dark-green">
+            <Button onClick={() => navigate('ai-advisor')} variant="outline" className="border-white text-white hover:bg-white hover:text-dark-green" data-track="hero-cta-kubera-ai">
               <Sparkles className="w-4 h-4" /> Ask Kubera AI
             </Button>
           </div>

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header, Footer, WhatsAppButton } from './components/layout';
+import tracker from './lib/tracker';
+import SubscribePopup from './components/SubscribePopup';
 import {
   HomePage,
   AboutPage,
@@ -12,7 +14,8 @@ import {
   TermsConditionsPage,
   DisclosurePage,
   BlogsPage,
-  BlogDetailPage
+  BlogDetailPage,
+  OTelLogsPage
 } from './pages';
 import ProposalWizard from './components/ProposalWizard';
 import ProposalEditForm from './pages/ProposalEditForm';
@@ -34,6 +37,9 @@ import {
   BMICalculator
 } from './pages/calculators';
 import ReactGA from "react-ga4";
+
+// Initialize tracker on module load
+tracker.init();
 
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -97,6 +103,7 @@ const App = () => {
       case 'privacy-policy': return <PrivacyPolicyPage />;
       case 'terms-conditions': return <TermsConditionsPage />;
       case 'disclosure': return <DisclosurePage />;
+      case 'otel-logs': return <OTelLogsPage />;
       default: {
         if (currentPage.startsWith('blog-detail-')) {
           const blogId = currentPage.replace('blog-detail-', '');
@@ -121,6 +128,7 @@ return (
         <>
           <Footer setCurrentPage={setCurrentPage} />
           <WhatsAppButton />
+          <SubscribePopup />
         </>
       )}
     </div>

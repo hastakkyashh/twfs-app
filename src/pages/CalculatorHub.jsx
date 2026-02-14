@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calculator, TrendingUp, PiggyBank, Target, Home, Briefcase, GraduationCap, FileText, Dumbbell, PersonStanding, HeartHandshake, Hourglass, ShieldPlus } from 'lucide-react';
+import { Calculator, TrendingUp, PiggyBank, Target, Home, Briefcase, GraduationCap, FileText, Dumbbell, PersonStanding, HeartHandshake, Hourglass, ShieldPlus, Activity } from 'lucide-react';
 import { SectionTitle } from '../components/ui';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -11,7 +11,16 @@ const CalculatorHub = ({ navigate = () => {} }) => {
       title: 'Proposal Wizard',
       description: 'Create comprehensive investment proposals with asset allocation strategies and projections.',
       icon: FileText,
-      available: true
+      available: true,
+      adminOnly: true
+    },
+    {
+      id: 'otel-logs',
+      title: 'OTel Logs',
+      description: 'View user behavior analytics, sessions, events, and subscriber activity dashboard.',
+      icon: Activity,
+      available: true,
+      adminOnly: true
     },
     {
       id: 'sip-calculator',
@@ -129,7 +138,7 @@ const CalculatorHub = ({ navigate = () => {} }) => {
       
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {calculators
-          .filter(calc => calc.id !== 'proposal-wizard' || isAuthenticated)
+          .filter(calc => !calc.adminOnly || isAuthenticated)
           .map((calc) => {
           const IconComponent = calc.icon;
           return (
@@ -141,6 +150,7 @@ const CalculatorHub = ({ navigate = () => {} }) => {
                   ? 'hover:border-primary-green hover:shadow-lg cursor-pointer' 
                   : 'opacity-50 cursor-not-allowed'
               }`}
+              data-track={`calc-card-${calc.id}`}
             >
               <div className="flex flex-col items-center text-center">
                 <div className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 transition-colors ${
