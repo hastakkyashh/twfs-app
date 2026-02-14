@@ -101,8 +101,8 @@ class Tracker {
     this.startFlushTimer();
 
     // Auto-track page views on hash change
-    this.trackPageView();
-    window.addEventListener('hashchange', () => this.trackPageView());
+    // this.trackPageView();
+    // window.addEventListener('hashchange', () => this.trackPageView());
 
     // Auto-track clicks on [data-track] elements
     document.addEventListener('click', (e) => this.handleClick(e), true);
@@ -118,7 +118,7 @@ class Tracker {
     });
     window.addEventListener('beforeunload', () => this.flush());
 
-    console.log('[Tracker] Initialized', { visitorId: this.visitorId, sessionId: this.sessionId });
+    // console.log('[Tracker] Initialized', { visitorId: this.visitorId, sessionId: this.sessionId });
   }
 
   /**
@@ -146,10 +146,10 @@ class Tracker {
   /**
    * Track a page view
    */
-  trackPageView() {
-    const page = window.location.hash || '#home';
-    this.track('page.view', { metadata: { page } });
-  }
+  // trackPageView() {
+  //   const page = window.location.hash || '#home';
+  //   this.track('page.view', { metadata: { page } });
+  // }
 
   /**
    * Handle click events - track [data-track] elements and social links
@@ -165,12 +165,12 @@ class Tracker {
     const link = e.target.closest('a[href]');
     if (link) {
       const href = link.getAttribute('href');
-      if (this.isSocialLink(href)) {
-        this.track('social.click', {
-          element: 'social-link',
-          metadata: { href, platform: this.getSocialPlatform(href) },
-        });
-      }
+      // if (this.isSocialLink(href)) {
+      //   this.track('social.click', {
+      //     element: 'social-link',
+      //     metadata: { href, platform: this.getSocialPlatform(href) },
+      //   });
+      // }
       // Track mailto clicks
       if (href && href.startsWith('mailto:')) {
         this.track('contact.email_click', {

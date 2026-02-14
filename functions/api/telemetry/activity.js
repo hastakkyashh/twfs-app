@@ -103,14 +103,14 @@ async function getOverview(db) {
       ORDER BY count DESC 
       LIMIT 10
     `).all(),
-    db.prepare(`
-      SELECT page, COUNT(*) as count 
-      FROM events 
-      WHERE event_type = 'page.view'
-      GROUP BY page 
-      ORDER BY count DESC 
-      LIMIT 10
-    `).all(),
+    // db.prepare(`
+    //   SELECT page, COUNT(*) as count 
+    //   FROM events 
+    //   WHERE event_type = 'page.view'
+    //   GROUP BY page 
+    //   ORDER BY count DESC 
+    //   LIMIT 10
+    // `).all(),
   ]);
 
   return {
@@ -121,7 +121,7 @@ async function getOverview(db) {
       total_subscribers: subscribersCount.count,
     },
     recent_event_types: recentEvents.results,
-    top_pages: topPages.results,
+    // top_pages: topPages.results,
   };
 }
 

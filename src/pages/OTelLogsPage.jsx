@@ -211,7 +211,7 @@ const OTelLogsPage = () => {
 // ============================================================================
  
 const OverviewTab = ({ data }) => {
-  const { stats, recent_event_types, top_pages } = data;
+  const { stats, recent_event_types } = data;
  
   return (
     <div className="space-y-6">
@@ -267,7 +267,7 @@ const OverviewTab = ({ data }) => {
           </div>
         </div>
  
-        {/* Top Pages */}
+        {/* Top Pages
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h3 className="text-lg font-semibold text-slate-900 mb-4 flex items-center gap-2">
             <Eye size={20} className="text-green-600" />
@@ -287,7 +287,7 @@ const OverviewTab = ({ data }) => {
               <p className="text-slate-400 text-sm">No page views recorded</p>
             )}
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

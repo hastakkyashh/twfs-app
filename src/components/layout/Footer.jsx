@@ -47,7 +47,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("home")}
                 className="hover:text-brand-orange"
-                data-track="footer-nav-home"
+                // data-track="footer-nav-home"
               >
                 Home
               </button>
@@ -56,7 +56,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("about")}
                 className="hover:text-brand-orange"
-                data-track="footer-nav-about"
+                // data-track="footer-nav-about"
               >
                 About Us
               </button>
@@ -65,7 +65,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("services")}
                 className="hover:text-brand-orange"
-                data-track="footer-nav-services"
+                // data-track="footer-nav-services"
               >
                 Our Services
               </button>
@@ -74,7 +74,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("calculator")}
                 className="hover:text-brand-orange"
-                data-track="footer-nav-calculator"
+                // data-track="footer-nav-calculator"
               >
                 Financial Calculators
               </button>
@@ -83,7 +83,7 @@ const Footer = ({ setCurrentPage }) => {
               <button
                 onClick={() => setCurrentPage("ai-advisor")}
                 className="hover:text-brand-orange"
-                data-track="footer-nav-ai-advisor"
+                // data-track="footer-nav-ai-advisor"
               >
                 Kubera AI
               </button>
