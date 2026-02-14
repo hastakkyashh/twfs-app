@@ -8,6 +8,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Mail, Bell } from 'lucide-react';
 import tracker from '../lib/tracker';
+import { SubscribeButton } from './layout';
 
 const POPUP_DELAY_MS = 60000; // 1 minute
 const DISMISSED_KEY = 'twfs_subscribe_dismissed'; // Used to track auto-popup behavior
@@ -87,21 +88,7 @@ const SubscribePopup = () => {
 
   // 2. If modal is NOT open, render the Floating Trigger Button (Minimized state)
   if (!isOpen) {
-    return (
-      <button
-        onClick={handleOpen}
-        // Positioned at bottom-24 (approx 96px) to sit above the WhatsApp button (bottom-6)
-        className="fixed bottom-24 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-2xl transition-all z-40 flex items-center justify-center animate-fade-in group"
-        aria-label="Subscribe to newsletter"
-        data-track="subscribe-fab-btn"
-      >
-        <Mail size={24} />
-        {/* Optional: Tooltip text that appears on hover */}
-        <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 ease-in-out whitespace-nowrap group-hover:ml-2">
-          Subscribe
-        </span>
-      </button>
-    );
+    return <SubscribeButton onClick={handleOpen} />;  
   }
 
   // 3. Render the Modal (Expanded state)

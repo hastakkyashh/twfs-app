@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Menu, X, Phone, Mail } from 'lucide-react';
-import { FaInstagram, FaXTwitter, FaFacebook, FaWhatsapp, FaTelegram, FaThreads } from 'react-icons/fa6';
+import { FaInstagram, FaXTwitter, FaFacebook, FaWhatsapp, FaTelegram, FaThreads, FaYoutube } from 'react-icons/fa6';
 import { BRAND, NAV_LINKS } from '../../constants';
 
 const Header = ({ currentPage, setCurrentPage }) => {
@@ -48,6 +48,9 @@ const Header = ({ currentPage, setCurrentPage }) => {
             <a href={BRAND.threads} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="Threads" data-track="header-social-threads">
               <FaThreads size={14} />
             </a>
+            <a href={BRAND.youtube} target="_blank" rel="noopener noreferrer" className="hover:text-brand-orange transition-colors" title="YouTube" data-track="header-social-youtube">
+              <FaYoutube size={14} />
+            </a>
           </div>
           <div className="flex gap-4">
             <span className="flex items-center gap-1"><Phone size={12} /> {BRAND.phone}</span>
@@ -77,6 +80,7 @@ const Header = ({ currentPage, setCurrentPage }) => {
                 className={`text-base font-medium hover:text-primary-green transition-colors flex items-center gap-1 ${
                   currentPage === link.id ? 'text-dark-green border-b-2 border-primary-green' : 'text-slate-600'
                 }`}
+                data-track={`header-nav-${link.id}`}
               >
                 {link.label}
               </button>
@@ -110,7 +114,8 @@ const Header = ({ currentPage, setCurrentPage }) => {
                   className={`text-left py-3 px-2 border-b border-slate-50 ${
                      currentPage === link.id ? 'text-dark-green font-bold bg-light-cream' : 'text-slate-600'
                   }`}
-                >
+                  data-track={`header-nav-${link.id}`}
+                  >
                   {link.label}
                 </button>
               ))}

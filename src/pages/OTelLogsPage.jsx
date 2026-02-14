@@ -9,40 +9,37 @@ import React, { useState, useEffect } from 'react';
 import { 
   Activity, Users, MousePointer, Mail, RefreshCw, 
   ChevronLeft, ChevronRight, Globe, Clock, Eye,
-  TrendingUp, BarChart3
+  TrendingUp, BarChart3, Lock
 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { getCurrentSession } from '../services/auth';
  
 const API_BASE = '/api/telemetry/activity';
  
 const OTelLogsPage = () => {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({ limit: 25, offset: 0 });
  
-  // Get auth token from localStorage
-  const getAuthToken = () => {
-    return localStorage.getItem('adminToken');
-  };
- 
   // Fetch data based on active tab
   const fetchData = async (type = activeTab, pag = pagination) => {
-    setLoading(true);
-    setError(null);
- 
-    const token = getAuthToken();
-    if (!token) {
-      setError('Not authenticated. Please login as admin.');
+    const session = getCurrentSession();
+    if (!isAuthenticated || !session?.token) {
       setLoading(false);
       return;
     }
+
+    setLoading(true);
+    setError(null);
  
     try {
       const url = `${API_BASE}?type=${type}&limit=${pag.limit}&offset=${pag.offset}`;
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${session.token}`,
           'Content-Type': 'application/json',
         },
       });
@@ -64,8 +61,10 @@ const OTelLogsPage = () => {
   };
  
   useEffect(() => {
-    fetchData();
-  }, [activeTab, pagination]);
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [activeTab, pagination, isAuthenticated]);
  
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -87,6 +86,28 @@ const OTelLogsPage = () => {
     { id: 'visitors', label: 'Visitors', icon: Users },
   ];
  
+  // Show loading while auth is being checked
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <RefreshCw size={32} className="animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  // Show auth required message if not authenticated
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-xl shadow-sm max-w-md">
+          <Lock size={48} className="mx-auto text-slate-400 mb-4" />
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Admin Access Required</h2>
+          <p className="text-slate-500">Please login as admin to view OTel Logs.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
@@ -103,7 +124,7 @@ const OTelLogsPage = () => {
             onClick={() => fetchData()}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            data-track="otel-refresh-btn"
+            // data-track="otel-refresh-btn"
           >
             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -121,7 +142,7 @@ const OTelLogsPage = () => {
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-slate-600 hover:bg-slate-100'
               }`}
-              data-track={`otel-tab-${tab.id}`}
+            // data-track={`otel-tab-${tab.id}`}
             >
               <tab.icon size={18} />
               {tab.label}

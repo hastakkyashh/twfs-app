@@ -9,6 +9,7 @@ export const BRAND = {
   Facebook: "https://www.facebook.com/share/1BGRAqjXG5/?mibextid=wwXIfr",
   X: "https://x.com/truewisefinsure",
   telegram: "http://t.me/truewisefinsure",
+  youtube: "https://youtube.com/@truewisefinsure",
   threads: "https://www.threads.com/@truewisefinsure?igshid=NTc4MTIwNjQ2YQ==",
   amfi_status: "AMFI Registered Mutual Fund Distributor (ARN-342645) | IRDAI Authorised Insurance POSP (POS Code-IP212377)",
 };

@@ -7,6 +7,7 @@ import {
   FaWhatsapp,
   FaTelegram,
   FaThreads,
+  FaYoutube,
 } from "react-icons/fa6";
 import {
   BRAND,
@@ -31,6 +32,7 @@ const Footer = ({ setCurrentPage }) => {
     },
     { label: "Telegram", url: BRAND.telegram, icon: FaTelegram },
     { label: "Threads", url: BRAND.threads, icon: FaThreads },
+    { label: "YouTube", url: BRAND.youtube, icon: FaYoutube },
   ];
 
   return (
