@@ -1,4 +1,4 @@
--- User behavior tracking tables for OTel-style analytics
+-- User behavior tracking tables for Tele-style analytics
 -- Migration: 0002_create_tracking_tables.sql
 
 -- Visitors: one row per unique browser cookie (visitor_id)
@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS events (
 -- Subscribers: email list with visitor linkage
 CREATE TABLE IF NOT EXISTS subscribers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT,
   email TEXT UNIQUE NOT NULL,
   visitor_id TEXT,
   subscribed_at TEXT NOT NULL DEFAULT (datetime('now'))

@@ -16,7 +16,7 @@ export async function onRequestPost(context) {
 
   try {
     const body = await context.request.json();
-    const { visitor_id, email } = body;
+    const { visitor_id, email, name } = body;
 
     // Validate required fields
     if (!visitor_id || !email) {
@@ -68,10 +68,10 @@ export async function onRequestPost(context) {
 
     // Upsert into subscribers table
     await db.prepare(`
-      INSERT INTO subscribers (email, visitor_id, subscribed_at)
-      VALUES (?, ?, datetime('now'))
-      ON CONFLICT(email) DO UPDATE SET visitor_id = ?
-    `).bind(normalizedEmail, visitor_id, visitor_id).run();
+      INSERT INTO subscribers (name, email, visitor_id, subscribed_at)
+      VALUES (?, ?, ?, datetime('now'))
+      ON CONFLICT(email) DO UPDATE SET visitor_id = ?, name = ?
+    `).bind(name || null, normalizedEmail, visitor_id, visitor_id, name || null).run();
 
     return new Response(
       JSON.stringify({ 

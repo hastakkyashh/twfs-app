@@ -263,19 +263,20 @@ class Tracker {
   }
 
   /**
-   * Identify the user with an email address
+   * Identify the user with an email address and optional name
    * Called when user subscribes or provides their email
    */
-  identify(email) {
+  identify(email, name = null) {
     if (!email || typeof email !== 'string') return;
 
     const payload = {
       visitor_id: this.visitorId,
       email: email.trim().toLowerCase(),
+      name: name ? name.trim() : null,
     };
 
     // Track the identify event locally
-    this.track('user.identify', { metadata: { email: payload.email } });
+    this.track('user.identify', { metadata: { email: payload.email, name: payload.name } });
 
     // Send to identify endpoint
     fetch(CONFIG.IDENTIFY_ENDPOINT, {

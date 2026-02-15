@@ -3,7 +3,7 @@
  * GET /api/telemetry/activity?type=overview|sessions|events|subscribers
  * 
  * Protected: requires admin session token in Authorization header.
- * Returns data for the OTel Logs dashboard.
+ * Returns data for the Tele Logs dashboard.
  */
 
 export async function onRequestGet(context) {
@@ -197,6 +197,7 @@ async function getSubscribers(db, limit, offset) {
   const { results } = await db.prepare(`
     SELECT 
       sub.id,
+      sub.name,
       sub.email,
       sub.visitor_id,
       sub.subscribed_at,

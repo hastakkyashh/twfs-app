@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { X, Mail, Bell } from 'lucide-react';
+import { X, Mail, Bell, User } from 'lucide-react';
 import tracker from '../lib/tracker';
 import { SubscribeButton } from './layout';
 
@@ -17,6 +17,7 @@ const SUBSCRIBED_KEY = 'twfs_subscribed';
 const SubscribePopup = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
@@ -62,7 +63,7 @@ const SubscribePopup = () => {
     setSubmitStatus(null);
 
     try {
-      tracker.identify(email);
+      tracker.identify(email, name);
       localStorage.setItem(SUBSCRIBED_KEY, email);
       
       setSubmitStatus('success');
@@ -101,7 +102,7 @@ const SubscribePopup = () => {
         {/* Close button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 transition-colors"
+          className="absolute top-4 right-4 p-2 text-slate-600 hover:text-slate-900 transition-colors"
           aria-label="Close"
           data-track="subscribe-popup-close"
         >
@@ -109,12 +110,12 @@ const SubscribePopup = () => {
         </button>
 
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-8 text-white text-center">
+        <div className="bg-brand-orange px-6 py-8 text-white text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-4">
             <Bell size={32} />
           </div>
           <h2 className="text-2xl font-bold mb-2">Stay Updated!</h2>
-          <p className="text-blue-100 text-sm">
+          <p className="text-green-100 text-sm">
             Get expert financial tips and exclusive updates delivered to your inbox.
           </p>
         </div>
@@ -123,16 +124,29 @@ const SubscribePopup = () => {
         <div className="p-6">
           {submitStatus === 'success' ? (
             <div className="text-center py-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mb-3">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-orange/10 rounded-full mb-3">
+                <svg className="w-6 h-6 text-brand-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <p className="text-green-600 font-medium">Thank you for subscribing!</p>
+              <p className="text-brand-orange font-medium">Thank you for subscribing!</p>
               <p className="text-slate-500 text-sm mt-1">We'll keep you updated.</p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your name"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all"
+                  required
+                  disabled={isSubmitting}
+                  data-track="subscribe-name-input"
+                />
+              </div>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 <input
@@ -140,7 +154,7 @@ const SubscribePopup = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
-                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-transparent transition-all"
                   required
                   disabled={isSubmitting}
                   data-track="subscribe-email-input"
@@ -156,7 +170,7 @@ const SubscribePopup = () => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3 bg-brand-orange text-white font-semibold rounded-lg disabled:cursor-not-allowed"
                 data-track="subscribe-submit-btn"
               >
                 {isSubmitting ? 'Subscribing...' : 'Subscribe Now'}

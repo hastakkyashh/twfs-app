@@ -15,8 +15,8 @@ const CalculatorHub = ({ navigate = () => {} }) => {
       adminOnly: true
     },
     {
-      id: 'otel-logs',
-      title: 'OTel Logs',
+      id: 'tele-logs',
+      title: 'Tele Logs',
       description: 'View user behavior analytics, sessions, events, and subscriber activity dashboard.',
       icon: Activity,
       available: true,

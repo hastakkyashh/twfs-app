@@ -10,4 +10,4 @@ export { default as TermsConditionsPage } from './TermsConditionsPage';
 export { default as DisclosurePage } from './DisclosurePage';
 export { default as BlogsPage } from './BlogsPage';
 export { default as BlogDetailPage } from './BlogDetailPage';
-export { default as OTelLogsPage } from './OTelLogsPage';
+export { default as TeleLogsPage } from './TeleLogsPage';

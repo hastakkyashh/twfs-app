@@ -1,5 +1,5 @@
 /**
- * OTel Logs Dashboard Page
+ * Tele Logs Dashboard Page
  * 
  * Admin-only page for viewing user behavior analytics.
  * Displays overview stats, sessions, events, and subscribers in tabbed tables.
@@ -16,7 +16,7 @@ import { getCurrentSession } from '../services/auth';
  
 const API_BASE = '/api/telemetry/activity';
  
-const OTelLogsPage = () => {
+const TeleLogsPage = () => {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState('overview');
   const [data, setData] = useState(null);
@@ -102,7 +102,7 @@ const OTelLogsPage = () => {
         <div className="text-center p-8 bg-white rounded-xl shadow-sm max-w-md">
           <Lock size={48} className="mx-auto text-slate-400 mb-4" />
           <h2 className="text-xl font-bold text-slate-900 mb-2">Admin Access Required</h2>
-          <p className="text-slate-500">Please login as admin to view OTel Logs.</p>
+          <p className="text-slate-500">Please login as admin to view Tele Logs.</p>
         </div>
       </div>
     );
@@ -116,7 +116,7 @@ const OTelLogsPage = () => {
           <div>
             <h1 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
               <Activity className="text-blue-600" />
-              OTel Logs Dashboard
+              Tele Logs Dashboard
             </h1>
             <p className="text-slate-500 mt-1">User behavior analytics and tracking data</p>
           </div>
@@ -124,7 +124,7 @@ const OTelLogsPage = () => {
             onClick={() => fetchData()}
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
-            // data-track="otel-refresh-btn"
+            // data-track="tele-refresh-btn"
           >
             <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
             Refresh
@@ -142,7 +142,7 @@ const OTelLogsPage = () => {
                   ? 'bg-blue-600 text-white'
                   : 'bg-white text-slate-600 hover:bg-slate-100'
               }`}
-            // data-track={`otel-tab-${tab.id}`}
+            // data-track={`tele-tab-${tab.id}`}
             >
               <tab.icon size={18} />
               {tab.label}
@@ -418,13 +418,14 @@ const EventsTab = ({ data }) => {
  
 const SubscribersTab = ({ data }) => {
   const { subscribers } = data;
- 
+
   return (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-slate-50 border-b border-slate-200">
             <tr>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">Name</th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">Email</th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">Subscribed</th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-slate-600">First Seen</th>
@@ -436,6 +437,9 @@ const SubscribersTab = ({ data }) => {
           <tbody className="divide-y divide-slate-100">
             {subscribers?.map((sub) => (
               <tr key={sub.id} className="hover:bg-slate-50">
+                <td className="px-4 py-3 text-sm text-slate-900">
+                  {sub.name || <span className="text-slate-400">-</span>}
+                </td>
                 <td className="px-4 py-3 text-sm font-medium text-slate-900">
                   {sub.email}
                 </td>
@@ -543,4 +547,4 @@ function getEventTypeColor(eventType) {
   return 'bg-slate-100 text-slate-700';
 }
  
-export default OTelLogsPage;
+export default TeleLogsPage;

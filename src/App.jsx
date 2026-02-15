@@ -15,7 +15,7 @@ import {
   DisclosurePage,
   BlogsPage,
   BlogDetailPage,
-  OTelLogsPage
+  TeleLogsPage
 } from './pages';
 import ProposalWizard from './components/ProposalWizard';
 import ProposalEditForm from './pages/ProposalEditForm';
@@ -103,7 +103,7 @@ const App = () => {
       case 'privacy-policy': return <PrivacyPolicyPage />;
       case 'terms-conditions': return <TermsConditionsPage />;
       case 'disclosure': return <DisclosurePage />;
-      case 'otel-logs': return <OTelLogsPage />;
+      case 'tele-logs': return <TeleLogsPage />;
       default: {
         if (currentPage.startsWith('blog-detail-')) {
           const blogId = currentPage.replace('blog-detail-', '');
