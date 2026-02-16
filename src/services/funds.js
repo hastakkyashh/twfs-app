@@ -57,7 +57,7 @@ export const searchFunds = async (query) => {
       return { funds: cached, cached: true };
     }
 
-    console.log(`Searching mfapi.in for: "${query}"`);
+    // console.log(`Searching mfapi.in for: "${query}"`);
     
     const response = await fetch(
       `${MFAPI_BASE_URL}/mf/search?q=${encodeURIComponent(query)}`
@@ -70,7 +70,7 @@ export const searchFunds = async (query) => {
     const funds = await response.json();
     
     if (!Array.isArray(funds)) {
-      console.log('Invalid response from mfapi.in');
+      // console.log('Invalid response from mfapi.in');
       return { funds: [], cached: false };
     }
 
@@ -81,7 +81,7 @@ export const searchFunds = async (query) => {
       name: fund.schemeName
     }));
 
-    console.log(`Found ${formattedFunds.length} mutual funds`);
+    // console.log(`Found ${formattedFunds.length} mutual funds`);
     
     setCache(cacheKey, formattedFunds);
     return { funds: formattedFunds, cached: false };
@@ -169,7 +169,7 @@ const calculateReturns = (data) => {
   const inceptionCAGR = (Math.pow((latestNav / inceptionNav), (1 / yearsIncep)) - 1) * 100;
   results['Since Inception'] = parseFloat(inceptionCAGR.toFixed(2));
 
-  console.log('Calculated returns:', results);
+  // console.log('Calculated returns:', results);
   return results;
 };
 
@@ -186,7 +186,7 @@ export const getFundDetails = async (symbol) => {
       return { fund: cached, cached: true };
     }
 
-    console.log(`Fetching fund details from mfapi.in for scheme code: ${symbol}`);
+    // console.log(`Fetching fund details from mfapi.in for scheme code: ${symbol}`);
     
     const response = await fetch(`${MFAPI_BASE_URL}/mf/${symbol}`);
     
@@ -251,7 +251,7 @@ export const getFundDetails = async (symbol) => {
 export const clearCache = () => {
   const size = cache.size;
   cache.clear();
-  console.log(`Cache cleared: ${size} items removed`);
+  // console.log(`Cache cleared: ${size} items removed`);
   return size;
 };
 

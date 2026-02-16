@@ -6,6 +6,10 @@
  * If the email already exists under a different visitor_id, merges the old data.
  */
 
+import { createDb } from '../../../src/db/index.js';
+import { visitors, events, sessions, subscribers } from '../../../src/db/schema.js';
+import { eq, and, ne } from 'drizzle-orm';
+
 export async function onRequestPost(context) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -27,51 +31,81 @@ export async function onRequestPost(context) {
     }
 
     const normalizedEmail = email.trim().toLowerCase();
-    const db = context.env.twfs_telemetry;
+    const db = createDb(context.env.twfs_telemetry);
+
+    // // console.log(`[identify] Processing identity for visitor_id: ${visitor_id}, email: ${normalizedEmail}`);
 
     // Check if this email already exists under a DIFFERENT visitor_id
-    const existingVisitor = await db.prepare(`
-      SELECT visitor_id FROM visitors WHERE email = ? AND visitor_id != ?
-    `).bind(normalizedEmail, visitor_id).first();
+    const existingVisitor = await db
+      .select({ visitorId: visitors.visitorId })
+      .from(visitors)
+      .where(and(eq(visitors.email, normalizedEmail), ne(visitors.visitorId, visitor_id)))
+      .get();
 
     if (existingVisitor) {
       // Merge: transfer all data from old visitor_id to current visitor_id
-      const oldVisitorId = existingVisitor.visitor_id;
+      const oldVisitorId = existingVisitor.visitorId;
+      // // console.log(`[identify] Merging data from old visitor_id: ${oldVisitorId} to new: ${visitor_id}`);
 
       // Update events to point to new visitor_id
-      await db.prepare(`
-        UPDATE events SET visitor_id = ? WHERE visitor_id = ?
-      `).bind(visitor_id, oldVisitorId).run();
+      await db.update(events)
+        .set({ visitorId: visitor_id })
+        .where(eq(events.visitorId, oldVisitorId))
+        .run();
 
       // Update sessions to point to new visitor_id
-      await db.prepare(`
-        UPDATE sessions SET visitor_id = ? WHERE visitor_id = ?
-      `).bind(visitor_id, oldVisitorId).run();
+      await db.update(sessions)
+        .set({ visitorId: visitor_id })
+        .where(eq(sessions.visitorId, oldVisitorId))
+        .run();
 
       // Delete the old visitor record
-      await db.prepare(`
-        DELETE FROM visitors WHERE visitor_id = ?
-      `).bind(oldVisitorId).run();
+      await db.delete(visitors)
+        .where(eq(visitors.visitorId, oldVisitorId))
+        .run();
 
       // Update subscriber record to new visitor_id
-      await db.prepare(`
-        UPDATE subscribers SET visitor_id = ? WHERE visitor_id = ?
-      `).bind(visitor_id, oldVisitorId).run();
+      await db.update(subscribers)
+        .set({ visitorId: visitor_id })
+        .where(eq(subscribers.visitorId, oldVisitorId))
+        .run();
+
+      // // console.log(`[identify] Merge completed successfully`);
     }
 
     // Upsert current visitor with email
-    await db.prepare(`
-      INSERT INTO visitors (visitor_id, email, first_seen_at, last_seen_at)
-      VALUES (?, ?, datetime('now'), datetime('now'))
-      ON CONFLICT(visitor_id) DO UPDATE SET email = ?, last_seen_at = datetime('now')
-    `).bind(visitor_id, normalizedEmail, normalizedEmail).run();
+    await db.insert(visitors)
+      .values({
+        visitorId: visitor_id,
+        email: normalizedEmail,
+        firstSeenAt: new Date().toISOString(),
+        lastSeenAt: new Date().toISOString(),
+      })
+      .onConflictDoUpdate({
+        target: visitors.visitorId,
+        set: {
+          email: normalizedEmail,
+          lastSeenAt: new Date().toISOString(),
+        },
+      })
+      .run();
 
     // Upsert into subscribers table
-    await db.prepare(`
-      INSERT INTO subscribers (name, email, visitor_id, subscribed_at)
-      VALUES (?, ?, ?, datetime('now'))
-      ON CONFLICT(email) DO UPDATE SET visitor_id = ?, name = ?
-    `).bind(name || null, normalizedEmail, visitor_id, visitor_id, name || null).run();
+    await db.insert(subscribers)
+      .values({
+        email: normalizedEmail,
+        visitorId: visitor_id,
+        subscribedAt: new Date().toISOString(),
+      })
+      .onConflictDoUpdate({
+        target: subscribers.email,
+        set: {
+          visitorId: visitor_id,
+        },
+      })
+      .run();
+
+    // // console.log(`[identify] Identity linked successfully for visitor: ${visitor_id}`);
 
     return new Response(
       JSON.stringify({ 

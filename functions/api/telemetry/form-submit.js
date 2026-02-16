@@ -6,6 +6,9 @@
  * Location is extracted from Cloudflare's request.cf (no user permission needed).
  */
 
+import { createDb } from '../../../src/db/index.js';
+import { enquiryFormSubmissions } from '../../../src/db/schema.js';
+
 export async function onRequestPost(context) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -38,31 +41,33 @@ export async function onRequestPost(context) {
     // User agent
     const userAgent = context.request.headers.get('User-Agent') || null;
 
-    const db = context.env.twfs_telemetry;
+    const db = createDb(context.env.twfs_telemetry);
 
-    const result = await db.prepare(`
-      INSERT INTO enquiry_form_submissions 
-        (name, dob, place, phone, email, service, 
-         cf_country, cf_city, cf_region, cf_latitude, cf_longitude, cf_timezone,
-         browser_latitude, browser_longitude, user_agent, submitted_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
-    `).bind(
-      name,
-      dob || null,
-      place || null,
-      phone,
-      email || null,
-      service || null,
-      cfCountry,
-      cfCity,
-      cfRegion,
-      cfLatitude,
-      cfLongitude,
-      cfTimezone,
-      browser_latitude || null,
-      browser_longitude || null,
-      userAgent
-    ).run();
+    // // console.log(`[form-submit] Storing form submission for: ${name}, phone: ${phone}`);
+
+    const result = await db.insert(enquiryFormSubmissions)
+      .values({
+        name: name,
+        dob: dob || null,
+        place: place || null,
+        phone: phone,
+        email: email || null,
+        service: service || null,
+        cfCountry: cfCountry,
+        cfCity: cfCity,
+        cfRegion: cfRegion,
+        cfLatitude: cfLatitude,
+        cfLongitude: cfLongitude,
+        cfTimezone: cfTimezone,
+        browserLatitude: browser_latitude || null,
+        browserLongitude: browser_longitude || null,
+        userAgent: userAgent,
+        submittedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      })
+      .run();
+
+    // // console.log(`[form-submit] Form submission stored successfully with ID: ${result.meta.last_row_id}`);
 
     return new Response(
       JSON.stringify({ success: true, id: result.meta.last_row_id }),

@@ -1,0 +1,10 @@
+# Drizzle ORM is now the source of truth for schema management
+# Do NOT manually edit or create .sql files in /migrations folder
+# All schema changes should be made in src/db/schema.js
+
+# Workflow:
+# 1. Edit src/db/schema.js
+# 2. Run: npx drizzle-kit generate
+# 3. Review generated migration in drizzle/migrations/
+# 4. Apply: npx wrangler d1 execute twfs-telemetry --local --file=./drizzle/migrations/<file>.sql
+# 5. Apply: npx wrangler d1 execute twfs-telemetry --remote --file=./drizzle/migrations/<file>.sql

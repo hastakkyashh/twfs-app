@@ -3,8 +3,10 @@ compatibility_date = "2026-01-30"
 pages_build_output_dir = "./dist"
 
 # D1 Database for telemetry (form submissions)
-# Create the database first: npx wrangler d1 create twfs-telemetry
-# Then replace YOUR_DATABASE_ID_HERE with the actual ID from the output
+# Schema is managed by Drizzle ORM - see src/db/schema.js
+# Migrations are generated with: npx drizzle-kit generate
+# Apply migrations locally: npx wrangler d1 execute twfs-telemetry --local --file=./drizzle/migrations/<migration>.sql
+# Apply migrations remotely: npx wrangler d1 execute twfs-telemetry --remote --file=./drizzle/migrations/<migration>.sql
 [[d1_databases]]
 binding = "twfs_telemetry"
 database_name = "twfs-telemetry"

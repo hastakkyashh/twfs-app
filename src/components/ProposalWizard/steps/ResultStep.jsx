@@ -15,10 +15,10 @@ const ResultStep = ({ formData, updateFormData, onPrev }) => {
     if (!showConfig && strategies.length > 0) {
       // Ensure formData has required fields
       if (formData.lumpsum !== undefined && formData.monthlySIP !== undefined && formData.stepUpPercentage !== undefined) {
-        console.log('Calculating projections with strategies:', strategies);
-        console.log('FormData:', formData);
+        // console.log('Calculating projections with strategies:', strategies);
+        // console.log('FormData:', formData);
         const calculatedProjections = calculateProjections(formData, strategies);
-        console.log('Calculated projections:', calculatedProjections);
+        // console.log('Calculated projections:', calculatedProjections);
         setProjections(calculatedProjections);
       } else {
         console.warn('Missing required formData fields for projection calculation');

@@ -27,3 +27,6 @@ dist-ssr
 
 # Wrangler local dev state (D1 local DB, etc.)
 .wrangler/
+
+# Drizzle Studio
+.drizzle-studio/

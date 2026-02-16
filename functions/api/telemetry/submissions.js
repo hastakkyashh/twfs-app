@@ -5,6 +5,10 @@
  * Protected: requires admin session token in Authorization header.
  */
 
+import { createDb } from '../../../src/db/index.js';
+import { enquiryFormSubmissions } from '../../../src/db/schema.js';
+import { desc, count } from 'drizzle-orm';
+
 export async function onRequestGet(context) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -45,19 +49,26 @@ export async function onRequestGet(context) {
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 200);
     const offset = parseInt(url.searchParams.get('offset') || '0');
 
-    const db = context.env.twfs_telemetry;
+    const db = createDb(context.env.twfs_telemetry);
+
+    // // console.log(`[submissions] Fetching submissions with limit: ${limit}, offset: ${offset}`);
 
     // Fetch submissions
-    const { results } = await db.prepare(`
-      SELECT * FROM enquiry_form_submissions 
-      ORDER BY submitted_at DESC 
-      LIMIT ? OFFSET ?
-    `).bind(limit, offset).all();
+    const results = await db
+      .select()
+      .from(enquiryFormSubmissions)
+      .orderBy(desc(enquiryFormSubmissions.submittedAt))
+      .limit(limit)
+      .offset(offset)
+      .all();
 
     // Get total count
-    const countResult = await db.prepare(
-      'SELECT COUNT(*) as total FROM enquiry_form_submissions'
-    ).first();
+    const countResult = await db
+      .select({ total: count() })
+      .from(enquiryFormSubmissions)
+      .get();
+
+    // // console.log(`[submissions] Found ${countResult.total} total submissions, returning ${results.length}`);
 
     return new Response(
       JSON.stringify({

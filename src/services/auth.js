@@ -46,11 +46,11 @@ export const login = async (username, password) => {
         loginTime: new Date().toISOString()
       }));
 
-      console.log('Login successful for user:', username);
+      // console.log('Login successful for user:', username);
       return { success: true };
     }
 
-    console.log('Login failed:', data.error);
+    // console.log('Login failed:', data.error);
     return { 
       success: false, 
       error: data.error || 'Invalid credentials' 
@@ -114,7 +114,7 @@ export const verifyAuth = async () => {
  */
 export const logout = () => {
   localStorage.removeItem(SESSION_KEY);
-  console.log('User logged out');
+  // console.log('User logged out');
 };
 
 /**

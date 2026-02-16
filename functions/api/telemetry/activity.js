@@ -6,6 +6,10 @@
  * Returns data for the Tele Logs dashboard.
  */
 
+import { createDb } from '../../../src/db/index.js';
+import { visitors, sessions, events, subscribers } from '../../../src/db/schema.js';
+import { eq, desc, count, sql } from 'drizzle-orm';
+
 export async function onRequestGet(context) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -47,7 +51,8 @@ export async function onRequestGet(context) {
     const limit = Math.min(parseInt(url.searchParams.get('limit') || '50'), 200);
     const offset = parseInt(url.searchParams.get('offset') || '0');
 
-    const db = context.env.twfs_telemetry;
+    const db = createDb(context.env.twfs_telemetry);
+    // console.log(`[activity] Fetching activity data, type: ${queryType}`);
     let result;
 
     switch (queryType) {
@@ -90,27 +95,23 @@ export async function onRequestGet(context) {
  * Get overview stats
  */
 async function getOverview(db) {
-  const [visitorsCount, sessionsCount, eventsCount, subscribersCount, recentEvents, topPages] = await Promise.all([
-    db.prepare('SELECT COUNT(*) as count FROM visitors').first(),
-    db.prepare('SELECT COUNT(*) as count FROM sessions').first(),
-    db.prepare('SELECT COUNT(*) as count FROM events').first(),
-    db.prepare('SELECT COUNT(*) as count FROM subscribers').first(),
-    db.prepare(`
-      SELECT event_type, COUNT(*) as count 
-      FROM events 
-      WHERE created_at > datetime('now', '-24 hours')
-      GROUP BY event_type 
-      ORDER BY count DESC 
-      LIMIT 10
-    `).all(),
-    // db.prepare(`
-    //   SELECT page, COUNT(*) as count 
-    //   FROM events 
-    //   WHERE event_type = 'page.view'
-    //   GROUP BY page 
-    //   ORDER BY count DESC 
-    //   LIMIT 10
-    // `).all(),
+  const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const [visitorsCount, sessionsCount, eventsCount, subscribersCount, recentEvents] = await Promise.all([
+    db.select({ count: count() }).from(visitors).get(),
+    db.select({ count: count() }).from(sessions).get(),
+    db.select({ count: count() }).from(events).get(),
+    db.select({ count: count() }).from(subscribers).get(),
+    db.select({
+      event_type: events.eventType,
+      count: count(),
+    })
+      .from(events)
+      .where(sql`${events.createdAt} > ${twentyFourHoursAgo}`)
+      .groupBy(events.eventType)
+      .orderBy(desc(count()))
+      .limit(10)
+      .all(),
   ]);
 
   return {
@@ -120,8 +121,7 @@ async function getOverview(db) {
       total_events: eventsCount.count,
       total_subscribers: subscribersCount.count,
     },
-    recent_event_types: recentEvents.results,
-    // top_pages: topPages.results,
+    recent_event_types: recentEvents,
   };
 }
 
@@ -129,24 +129,26 @@ async function getOverview(db) {
  * Get sessions with visitor info
  */
 async function getSessions(db, limit, offset) {
-  const { results } = await db.prepare(`
-    SELECT 
-      s.session_id,
-      s.visitor_id,
-      v.email,
-      s.started_at,
-      s.last_active_at,
-      s.user_agent,
-      s.cf_country,
-      s.cf_city,
-      (SELECT COUNT(*) FROM events WHERE session_id = s.session_id) as event_count
-    FROM sessions s
-    LEFT JOIN visitors v ON s.visitor_id = v.visitor_id
-    ORDER BY s.started_at DESC
-    LIMIT ? OFFSET ?
-  `).bind(limit, offset).all();
+  const results = await db
+    .select({
+      session_id: sessions.sessionId,
+      visitor_id: sessions.visitorId,
+      email: visitors.email,
+      started_at: sessions.startedAt,
+      last_active_at: sessions.lastActiveAt,
+      user_agent: sessions.userAgent,
+      cf_country: sessions.cfCountry,
+      cf_city: sessions.cfCity,
+      event_count: sql`(SELECT COUNT(*) FROM ${events} WHERE ${events.sessionId} = ${sessions.sessionId})`.as('event_count'),
+    })
+    .from(sessions)
+    .leftJoin(visitors, eq(sessions.visitorId, visitors.visitorId))
+    .orderBy(desc(sessions.startedAt))
+    .limit(limit)
+    .offset(offset)
+    .all();
 
-  const countResult = await db.prepare('SELECT COUNT(*) as total FROM sessions').first();
+  const countResult = await db.select({ total: count() }).from(sessions).get();
 
   return {
     sessions: results,
@@ -160,27 +162,29 @@ async function getSessions(db, limit, offset) {
  * Get events with session and visitor info
  */
 async function getEvents(db, limit, offset) {
-  const { results } = await db.prepare(`
-    SELECT 
-      e.id,
-      e.visitor_id,
-      v.email,
-      e.session_id,
-      e.event_type,
-      e.page,
-      e.element,
-      e.metadata,
-      e.created_at,
-      s.cf_country,
-      s.cf_city
-    FROM events e
-    LEFT JOIN visitors v ON e.visitor_id = v.visitor_id
-    LEFT JOIN sessions s ON e.session_id = s.session_id
-    ORDER BY e.created_at DESC
-    LIMIT ? OFFSET ?
-  `).bind(limit, offset).all();
+  const results = await db
+    .select({
+      id: events.id,
+      visitor_id: events.visitorId,
+      email: visitors.email,
+      session_id: events.sessionId,
+      event_type: events.eventType,
+      page: events.page,
+      element: events.element,
+      metadata: events.metadata,
+      created_at: events.createdAt,
+      cf_country: sessions.cfCountry,
+      cf_city: sessions.cfCity,
+    })
+    .from(events)
+    .leftJoin(visitors, eq(events.visitorId, visitors.visitorId))
+    .leftJoin(sessions, eq(events.sessionId, sessions.sessionId))
+    .orderBy(desc(events.createdAt))
+    .limit(limit)
+    .offset(offset)
+    .all();
 
-  const countResult = await db.prepare('SELECT COUNT(*) as total FROM events').first();
+  const countResult = await db.select({ total: count() }).from(events).get();
 
   return {
     events: results,
@@ -194,27 +198,53 @@ async function getEvents(db, limit, offset) {
  * Get subscribers with activity summary
  */
 async function getSubscribers(db, limit, offset) {
-  const { results } = await db.prepare(`
-    SELECT 
-      sub.id,
-      sub.name,
-      sub.email,
-      sub.visitor_id,
-      sub.subscribed_at,
-      v.first_seen_at,
-      v.last_seen_at,
-      (SELECT COUNT(*) FROM events WHERE visitor_id = sub.visitor_id) as total_events,
-      (SELECT COUNT(*) FROM sessions WHERE visitor_id = sub.visitor_id) as total_sessions
-    FROM subscribers sub
-    LEFT JOIN visitors v ON sub.visitor_id = v.visitor_id
-    ORDER BY sub.subscribed_at DESC
-    LIMIT ? OFFSET ?
-  `).bind(limit, offset).all();
+  // Fetch subscribers with visitor info
+  const results = await db
+    .select({
+      id: subscribers.id,
+      email: subscribers.email,
+      visitor_id: subscribers.visitorId,
+      subscribed_at: subscribers.subscribedAt,
+      first_seen_at: visitors.firstSeenAt,
+      last_seen_at: visitors.lastSeenAt,
+    })
+    .from(subscribers)
+    .leftJoin(visitors, eq(subscribers.visitorId, visitors.visitorId))
+    .orderBy(desc(subscribers.subscribedAt))
+    .limit(limit)
+    .offset(offset)
+    .all();
 
-  const countResult = await db.prepare('SELECT COUNT(*) as total FROM subscribers').first();
+  // Fetch event and session counts for each subscriber
+  const enrichedResults = await Promise.all(
+    results.map(async (subscriber) => {
+      if (!subscriber.visitor_id) {
+        return { ...subscriber, total_events: 0, total_sessions: 0 };
+      }
+
+      const [eventCount, sessionCount] = await Promise.all([
+        db.select({ count: count() })
+          .from(events)
+          .where(eq(events.visitorId, subscriber.visitor_id))
+          .get(),
+        db.select({ count: count() })
+          .from(sessions)
+          .where(eq(sessions.visitorId, subscriber.visitor_id))
+          .get(),
+      ]);
+
+      return {
+        ...subscriber,
+        total_events: eventCount.count,
+        total_sessions: sessionCount.count,
+      };
+    })
+  );
+
+  const countResult = await db.select({ total: count() }).from(subscribers).get();
 
   return {
-    subscribers: results,
+    subscribers: enrichedResults,
     total: countResult.total,
     limit,
     offset,
@@ -225,23 +255,46 @@ async function getSubscribers(db, limit, offset) {
  * Get visitors with activity summary
  */
 async function getVisitors(db, limit, offset) {
-  const { results } = await db.prepare(`
-    SELECT 
-      v.visitor_id,
-      v.email,
-      v.first_seen_at,
-      v.last_seen_at,
-      (SELECT COUNT(*) FROM events WHERE visitor_id = v.visitor_id) as total_events,
-      (SELECT COUNT(*) FROM sessions WHERE visitor_id = v.visitor_id) as total_sessions
-    FROM visitors v
-    ORDER BY v.last_seen_at DESC
-    LIMIT ? OFFSET ?
-  `).bind(limit, offset).all();
+  // Fetch visitors
+  const results = await db
+    .select({
+      visitor_id: visitors.visitorId,
+      email: visitors.email,
+      first_seen_at: visitors.firstSeenAt,
+      last_seen_at: visitors.lastSeenAt,
+    })
+    .from(visitors)
+    .orderBy(desc(visitors.lastSeenAt))
+    .limit(limit)
+    .offset(offset)
+    .all();
 
-  const countResult = await db.prepare('SELECT COUNT(*) as total FROM visitors').first();
+  // Fetch event and session counts for each visitor
+  const enrichedResults = await Promise.all(
+    results.map(async (visitor) => {
+      const [eventCount, sessionCount] = await Promise.all([
+        db.select({ count: count() })
+          .from(events)
+          .where(eq(events.visitorId, visitor.visitor_id))
+          .get(),
+        db.select({ count: count() })
+          .from(sessions)
+          .where(eq(sessions.visitorId, visitor.visitor_id))
+          .get(),
+      ]);
+
+      return {
+        ...visitor,
+        total_events: eventCount.count,
+        total_sessions: sessionCount.count,
+      };
+    })
+  );
+
+  const countResult = await db.select({ total: count() }).from(visitors).get();
 
   return {
-    visitors: results,
+    visitors: enrichedResults,
     total: countResult.total,
     limit,
     offset,

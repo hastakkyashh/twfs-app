@@ -118,7 +118,7 @@ class Tracker {
     });
     window.addEventListener('beforeunload', () => this.flush());
 
-    // console.log('[Tracker] Initialized', { visitorId: this.visitorId, sessionId: this.sessionId });
+    // // console.log('[Tracker] Initialized', { visitorId: this.visitorId, sessionId: this.sessionId });
   }
 
   /**

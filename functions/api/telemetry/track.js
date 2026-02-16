@@ -6,6 +6,9 @@
  * Upserts visitor and session, then inserts all events.
  */
 
+import { createDb } from '../../../src/db/index.js';
+import { visitors, sessions, events as eventsTable } from '../../../src/db/schema.js';
+
 export async function onRequestPost(context) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
@@ -33,42 +36,60 @@ export async function onRequestPost(context) {
     const cfRegion = cf.region || null;
     const userAgent = context.request.headers.get('User-Agent') || null;
 
-    const db = context.env.twfs_telemetry;
+    const db = createDb(context.env.twfs_telemetry);
+
+    // console.log(`[track] Tracking ${events.length} events for visitor: ${visitor_id}, session: ${session_id}`);
 
     // Upsert visitor
-    await db.prepare(`
-      INSERT INTO visitors (visitor_id, first_seen_at, last_seen_at)
-      VALUES (?, datetime('now'), datetime('now'))
-      ON CONFLICT(visitor_id) DO UPDATE SET last_seen_at = datetime('now')
-    `).bind(visitor_id).run();
+    await db.insert(visitors)
+      .values({
+        visitorId: visitor_id,
+        firstSeenAt: new Date().toISOString(),
+        lastSeenAt: new Date().toISOString(),
+      })
+      .onConflictDoUpdate({
+        target: visitors.visitorId,
+        set: {
+          lastSeenAt: new Date().toISOString(),
+        },
+      })
+      .run();
 
     // Upsert session
-    await db.prepare(`
-      INSERT INTO sessions (session_id, visitor_id, started_at, last_active_at, user_agent, cf_country, cf_city, cf_region)
-      VALUES (?, ?, datetime('now'), datetime('now'), ?, ?, ?, ?)
-      ON CONFLICT(session_id) DO UPDATE SET last_active_at = datetime('now')
-    `).bind(session_id, visitor_id, userAgent, cfCountry, cfCity, cfRegion).run();
+    await db.insert(sessions)
+      .values({
+        sessionId: session_id,
+        visitorId: visitor_id,
+        startedAt: new Date().toISOString(),
+        lastActiveAt: new Date().toISOString(),
+        userAgent: userAgent,
+        cfCountry: cfCountry,
+        cfCity: cfCity,
+        cfRegion: cfRegion,
+      })
+      .onConflictDoUpdate({
+        target: sessions.sessionId,
+        set: {
+          lastActiveAt: new Date().toISOString(),
+        },
+      })
+      .run();
 
     // Insert events in batch
-    const insertStmt = db.prepare(`
-      INSERT INTO events (visitor_id, session_id, event_type, page, element, metadata, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
+    const eventValues = events.map((event) => ({
+      visitorId: visitor_id,
+      sessionId: session_id,
+      eventType: event.event_type || 'unknown',
+      page: event.page || null,
+      element: event.element || null,
+      metadata: event.metadata || null,
+      createdAt: event.timestamp || new Date().toISOString(),
+    }));
 
-    const batch = events.map((event) => {
-      return insertStmt.bind(
-        visitor_id,
-        session_id,
-        event.event_type || 'unknown',
-        event.page || null,
-        event.element || null,
-        event.metadata || null,
-        event.timestamp || new Date().toISOString()
-      );
-    });
+    // Execute batch insert
+    await db.insert(eventsTable).values(eventValues).run();
 
-    // Execute batch
-    await db.batch(batch);
+    // console.log(`[track] Successfully tracked ${events.length} events`);
 
     return new Response(
       JSON.stringify({ success: true, events_received: events.length }),
