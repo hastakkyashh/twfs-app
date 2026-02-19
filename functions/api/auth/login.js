@@ -3,6 +3,17 @@
  * This runs server-side and keeps credentials secure
  */
 
+/*
+[file] login.js
+[role] secure endpoint for login
+[description]
+- has access to the environment variables securely (not exposed to client)
+- receives username and password_hash from client (/services/auth.js)
+- compares the password_hash with the stored password_hash
+- if match, mints a new session token and returns it to the auth.js
+- if not match, returns an error
+*/
+
 /**
  * Hash a string using SHA-256 via Web Crypto API
  * @param {string} message

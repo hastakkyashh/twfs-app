@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, ArrowLeft } from 'lucide-react';
 
-const BlogDetailPage = ({ navigate, blogId }) => {
+const BlogDetailPage = () => {
+  const { blogId } = useParams();
+  const navigate = useNavigate();
   const [blog, setBlog] = useState(null);
   const [allBlogs, setAllBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,10 +38,7 @@ const BlogDetailPage = ({ navigate, blogId }) => {
         <div className="text-center">
           <h2 className="text-2xl font-bold text-slate-900 mb-4">Blog not found</h2>
           <button
-            onClick={() => {
-              window.location.hash = 'blogs';
-              navigate('blogs');
-            }}
+            onClick={() => navigate('/blogs')}
             className="text-dark-green hover:underline"
           >
             Return to Blogs
@@ -53,10 +53,7 @@ const BlogDetailPage = ({ navigate, blogId }) => {
       <section className="bg-dark-green text-white py-12 px-6">
         <div className="max-w-4xl mx-auto">
           <button
-            onClick={() => {
-              window.location.hash = 'blogs';
-              navigate('blogs');
-            }}
+            onClick={() => navigate('/blogs')}
             className="flex items-center gap-2 text-slate-200 hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft size={20} />
@@ -121,10 +118,7 @@ const BlogDetailPage = ({ navigate, blogId }) => {
                 Our expert advisors at TrueWise FinSure are here to help you make informed financial decisions tailored to your unique goals.
               </p>
               <button
-                onClick={() => {
-                  window.location.hash = 'contact';
-                  navigate('contact');
-                }}
+                onClick={() => navigate('/contact')}
                 className="bg-dark-green text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-green transition-colors"
               >
                 Contact Us Today
@@ -142,8 +136,7 @@ const BlogDetailPage = ({ navigate, blogId }) => {
               <div
                 key={relatedBlog.id}
                 onClick={() => {
-                  window.location.hash = `blog-detail-${relatedBlog.id}`;
-                  navigate(`blog-detail-${relatedBlog.id}`);
+                  navigate(`/blogs/${relatedBlog.id}`);
                   window.scrollTo(0, 0);
                 }}
                 className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow cursor-pointer p-5"

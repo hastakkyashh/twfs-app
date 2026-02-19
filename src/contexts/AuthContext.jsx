@@ -1,3 +1,11 @@
+/*
+[file] AuthContext.jsx
+[role] Authentication Context
+[description] 
+- Accessible to all components, no passing props required. (#Context Provider)
+- Manages authentication state and provides authentication functions.
+- Provides authentication context to child components.
+*/
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import * as authService from '../services/auth';
 

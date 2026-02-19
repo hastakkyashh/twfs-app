@@ -1,4 +1,21 @@
-import React, { useState, useEffect } from 'react';
+/*
+[file] App.jsx
+[role] Map the URL routes to Page components.
+[description] 
+- React Router Integration
+- Global Layout Manager (Header, Footer, WhatsApp Button, Subscribe Popup)
+- Google Analytics Integration
+- Page Navigation and State Management
+- Component Rendering
+- Event Tracking via tracker.js
+- Scroll Restoration
+[Internal]- 'lib/tracker' (Custom Telemetry), All Page & Calculator components.
+[External]- 'react-ga4' (Google Analytics), 'react-router-dom' (Routing).
+
+*/
+
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { Header, Footer, WhatsAppButton } from './components/layout';
 import tracker from './lib/tracker';
 import SubscribePopup from './components/SubscribePopup';
@@ -41,92 +58,75 @@ import ReactGA from "react-ga4";
 // Initialize tracker on module load
 tracker.init();
 
-const App = () => {
-  const [currentPage, setCurrentPage] = useState('home');
-
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.slice(1);
-      if (hash) {
-        setCurrentPage(hash);
-      }
-    };
-
-    handleHashChange();
-    window.addEventListener('hashchange', handleHashChange);
-
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
+// Component to handle scroll restoration and analytics
+const ScrollToTop = () => {
+  const location = useLocation();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [currentPage]);
+  }, [location.pathname]);
 
   useEffect(() => {
-    const pagePath = `/${currentPage}`;
+    const pagePath = location.pathname;
+    const pageTitle = pagePath.split('/').filter(Boolean)[0] || 'home';
     
     ReactGA.send({ 
       hitType: "pageview", 
       page: pagePath, 
-      title: currentPage.charAt(0).toUpperCase() + currentPage.slice(1) 
+      title: pageTitle.charAt(0).toUpperCase() + pageTitle.slice(1) 
     });
-  }, [currentPage]);
+  }, [location.pathname]);
 
-  const renderPage = () => {
-    switch(currentPage) {
-      case 'home': return <HomePage navigate={setCurrentPage} />;
-      case 'about': return <AboutPage />;
-      case 'services': return <ServicesPage />;
-      case 'education': return <EducationPage />;
-      case 'ai-advisor': return <AIAssistantPage />;
-      case 'calculator': return <CalculatorHub navigate={setCurrentPage} />;
-      case 'proposal-wizard': return <ProposalWizard />;
-      case 'proposal-preview': return <ProposalPreview />;
-      case 'proposal-edit-form': return <ProposalEditForm />;
-      case 'sip-calculator': return <SIPCalculator />;
-      case 'lumpsum-calculator': return <LumpsumCalculator />;
-      case 'retirement-calculator': return <RetirementCalculator />;
-      case 'emi-calculator': return <EMICalculator />;
-      case 'cost-of-delay-calculator': return <CostOfDelayCalculator />;
-      case 'education-calculator': return <EducationCalculator />;
-      case 'marriage-calculator': return <MarriageCalculator />;
-      case 'sip-tenure-calculator': return <SIPTenureCalculator />;
-      case 'sip-stepup-calculator': return <SIPStepUpCalculator />;
-      case 'sip-planner-calculator': return <SIPPlannerCalculator />;
-      case 'stp-calculator': return <STPCalculator />;
-      case 'swp-calculator': return <SWPCalculator />;
-      case 'human-life-value-calculator': return <HumanLifeValueCalculator />;
-      case 'pension-calculator': return <PensionCalculator />;
-      case 'bmi-calculator': return <BMICalculator />;
-      case 'contact': return <ContactPage />;
-      case 'blogs': return <BlogsPage navigate={setCurrentPage} />;
-      case 'privacy-policy': return <PrivacyPolicyPage />;
-      case 'terms-conditions': return <TermsConditionsPage />;
-      case 'disclosure': return <DisclosurePage />;
-      case 'tele-logs': return <TeleLogsPage />;
-      default: {
-        if (currentPage.startsWith('blog-detail-')) {
-          const blogId = currentPage.replace('blog-detail-', '');
-          return <BlogDetailPage navigate={setCurrentPage} blogId={blogId} />;
-        }
-        return <HomePage navigate={setCurrentPage} />;
-      }
-    }
-  };
+  return null;
+};
 
-  const isFormPage = currentPage === 'proposal-edit-form';
+const AppContent = () => {
+  const location = useLocation();
+  const isFormPage = location.pathname === '/proposal-edit-form';
 
-return (
+  return (
     <div className="min-h-screen bg-white font-sans text-slate-900 flex flex-col">
-      {!isFormPage && <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />}
+      <ScrollToTop />
+      {!isFormPage && <Header />}
       
       <main className="flex-grow">
-        {renderPage()}
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/education" element={<EducationPage />} />
+          <Route path="/ai-advisor" element={<AIAssistantPage />} />
+          <Route path="/calculator" element={<CalculatorHub />} />
+          <Route path="/proposal-wizard" element={<ProposalWizard />} />
+          <Route path="/proposal-edit-form" element={<ProposalEditForm />} />
+          <Route path="/sip-calculator" element={<SIPCalculator />} />
+          <Route path="/lumpsum-calculator" element={<LumpsumCalculator />} />
+          <Route path="/retirement-calculator" element={<RetirementCalculator />} />
+          <Route path="/emi-calculator" element={<EMICalculator />} />
+          <Route path="/cost-of-delay-calculator" element={<CostOfDelayCalculator />} />
+          <Route path="/education-calculator" element={<EducationCalculator />} />
+          <Route path="/marriage-calculator" element={<MarriageCalculator />} />
+          <Route path="/sip-tenure-calculator" element={<SIPTenureCalculator />} />
+          <Route path="/sip-stepup-calculator" element={<SIPStepUpCalculator />} />
+          <Route path="/sip-planner-calculator" element={<SIPPlannerCalculator />} />
+          <Route path="/stp-calculator" element={<STPCalculator />} />
+          <Route path="/swp-calculator" element={<SWPCalculator />} />
+          <Route path="/human-life-value-calculator" element={<HumanLifeValueCalculator />} />
+          <Route path="/pension-calculator" element={<PensionCalculator />} />
+          <Route path="/bmi-calculator" element={<BMICalculator />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/blogs" element={<BlogsPage />} />
+          <Route path="/blogs/:blogId" element={<BlogDetailPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms-conditions" element={<TermsConditionsPage />} />
+          <Route path="/disclosure" element={<DisclosurePage />} />
+          <Route path="/tele-logs" element={<TeleLogsPage />} />
+        </Routes>
       </main>
 
       {!isFormPage && (
         <>
-          <Footer setCurrentPage={setCurrentPage} />
+          <Footer />
           <WhatsAppButton />
           <SubscribePopup />
         </>
@@ -134,4 +134,13 @@ return (
     </div>
   );
 };
+
+const App = () => {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
+};
+
 export default App;

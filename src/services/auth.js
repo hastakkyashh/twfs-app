@@ -4,6 +4,18 @@
  */
 
 // Session storage key
+
+/*
+[file] auth.js
+[role] Authentication Service
+[description] 
+- hash password using crypto.subtle.digest
+- store hashed password in localStorage
+- send fetch req to CF @ /api/auth/login
+- compare hashed password with server-side hashed password
+- if match, store token in localStorage
+- remove the token from localStorage on logout
+*/
 const SESSION_KEY = 'finsure_auth_session';
 
 /**
