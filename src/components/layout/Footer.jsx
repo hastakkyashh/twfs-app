@@ -72,6 +72,15 @@ const Footer = ({ setCurrentPage }) => {
             </li>
             <li>
               <button
+                onClick={() => setCurrentPage("blogs")}
+                className="hover:text-brand-orange"
+                // data-track="footer-nav-blogs"
+              >
+                Blogs
+              </button>
+            </li>
+            <li>
+              <button
                 onClick={() => setCurrentPage("calculator")}
                 className="hover:text-brand-orange"
                 // data-track="footer-nav-calculator"
@@ -97,6 +106,7 @@ const Footer = ({ setCurrentPage }) => {
                 Contact Us
               </button>
             </li>
+
           </ul>
         </div>
 

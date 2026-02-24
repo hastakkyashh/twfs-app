@@ -1,4 +1,4 @@
-import { TrendingUp, Rocket, Building2, Banknote, Briefcase, LineChart, Globe, Heart, Plane, Car, Truck, Shield, PiggyBank } from 'lucide-react';
+import { TrendingUp, Rocket, FileText , Banknote, Gem, Heart, Home, Plane, Car, Truck, Shield, PiggyBank } from 'lucide-react';
 
 export const SERVICES = [
   {
@@ -7,14 +7,14 @@ export const SERVICES = [
     icon: TrendingUp
   },
   {
-    title: "Pre-IPO & NFO",
-    desc: "Get early access to promising investment opportunities before they go public. Participate in New Fund Offers (NFOs) and pre-IPO placements to potentially maximize returns with strategic entry points.",
+    title: "NFO",
+    desc: "Get early access to promising investment opportunities. Participate in New Fund Offers (NFOs) to potentially maximize returns with strategic entry points.",
     icon: Rocket
   },
   {
-    title: "Bonds & Debentures",
-    desc: "Secure steady income through fixed-income instruments. Invest in corporate bonds, government securities, and debentures offering predictable returns with varying maturity periods and credit ratings.",
-    icon: Building2
+    title: "Bonds",
+    desc: "Secure steady income through reliable fixed income instruments. Invest in corporate bonds and government securities offering predictable returns with varying maturity periods and credit ratings.",
+    icon: FileText 
   },
   {
     title: "Loan Against Mutual Funds",
@@ -22,19 +22,9 @@ export const SERVICES = [
     icon: Banknote
   },
   {
-    title: "Alternative Investment Funds (AIFs)",
-    desc: "Explore sophisticated investment strategies beyond traditional assets. Access Category I, II, and III AIFs including venture capital, private equity, and hedge funds for high-net-worth portfolios.",
-    icon: Briefcase
-  },
-  {
-    title: "Portfolio Management Services (PMS)",
-    desc: "Receive personalized wealth management with dedicated portfolio managers. Customized investment strategies designed for high-value investors seeking active management and superior risk-adjusted returns.",
-    icon: LineChart
-  },
-  {
     title: "GIFT City Products",
     desc: "Invest in India's premier international financial hub. Access global investment opportunities, tax-efficient structures, and international securities through GIFT City's regulatory framework.",
-    icon: Globe
+    icon: Gem
   },
   {
     title: "Life Insurance",
@@ -45,6 +35,11 @@ export const SERVICES = [
     title: "Health Insurance",
     desc: "Safeguard against medical emergencies with robust health coverage. Individual and family floater plans offering cashless hospitalization, critical illness cover, and comprehensive healthcare benefits.",
     icon: Shield
+  },
+  {
+    title: "Home Insurance",
+    desc: "Protect your most valuable asset against natural disasters, theft, and accidental damage. Comprehensive coverage for your building structure and household contents to ensure absolute peace of mind.",
+    icon: Home
   },
   {
     title: "Travel Insurance",
