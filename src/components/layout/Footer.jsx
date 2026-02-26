@@ -114,12 +114,10 @@ const Footer = ({ setCurrentPage }) => {
           <h4 className="text-white font-bold mb-3">Investment Solutions</h4>
           <ul className="space-y-1.5 text-sm">
             <li>Mutual Funds</li>
-            <li>Pre-IPO & NFO</li>
-            <li>Bonds & Debentures</li>
+            <li>NFO</li>
+            <li>Bonds</li>
             <li>GIFT City Products</li>
             <li>Loan Against Mutual Funds</li>
-            <li>Alternative Investment Funds</li>
-            <li>Portfolio Management Services</li>
           </ul>
         </div>
 
