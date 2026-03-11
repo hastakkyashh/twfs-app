@@ -1,3 +1,15 @@
+
+/*
+[Description]
+- main component that holds the state of the complete proposal
+- handles form data, portfolio funds, and projections
+- also handles PDF generation
+- all the data from the previous form steps is loaded from sessionStorage *important*
+- line 80-90: any parameter of the [ ] is changed the calculatePortfolioProjections() is called to recalculate the projections
+- @react-pdf/renderer creates a brand new document from scratch in the background using the data we passed it, thus the PDF looks completely different from website. {the window.print() will just print the current html page}
+
+*/
+
 import React, { useEffect, useState } from "react";
 import {
   calculateFutureValue,

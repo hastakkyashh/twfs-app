@@ -2,7 +2,14 @@
  * Cloudflare Pages Function for Token Verification
  * This runs server-side and keeps credentials secure
  */
-
+/*
+[file] verify.js
+[role] checking if a token is still valid.
+[description]
+- When auth.js loads, it calls this function to check if the token is still valid.
+- decodes the token and checks the timestamp
+- returns true if valid, false otherwise
+*/
 export async function onRequestPost(context) {
   try {
     const authHeader = context.request.headers.get('Authorization');

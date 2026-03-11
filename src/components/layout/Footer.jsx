@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Phone, Mail, ArrowRight, Lock, LogOut } from "lucide-react";
 import {
   FaInstagram,
@@ -17,7 +18,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import AdminLoginModal from "../AdminLoginModal";
 
-const Footer = ({ setCurrentPage }) => {
+const Footer = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
 
@@ -44,67 +45,53 @@ const Footer = ({ setCurrentPage }) => {
           <h4 className="text-white font-bold mb-3">Quick Links</h4>
           <ul className="space-y-1.5 text-sm">
             <li>
-              <button
-                onClick={() => setCurrentPage("home")}
+              <Link
+                to="/"
                 className="hover:text-brand-orange"
-                // data-track="footer-nav-home"
               >
                 Home
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => setCurrentPage("about")}
+              <Link
+                to="/about"
                 className="hover:text-brand-orange"
-                // data-track="footer-nav-about"
               >
                 About Us
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => setCurrentPage("services")}
+              <Link
+                to="/services"
                 className="hover:text-brand-orange"
-                // data-track="footer-nav-services"
               >
                 Our Services
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => setCurrentPage("blogs")}
+              <Link
+                to="/calculator"
                 className="hover:text-brand-orange"
-                // data-track="footer-nav-blogs"
-              >
-                Blogs
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => setCurrentPage("calculator")}
-                className="hover:text-brand-orange"
-                // data-track="footer-nav-calculator"
               >
                 Financial Calculators
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => setCurrentPage("ai-advisor")}
+              <Link
+                to="/ai-advisor"
                 className="hover:text-brand-orange"
-                // data-track="footer-nav-ai-advisor"
               >
                 Kubera AI
-              </button>
+              </Link>
             </li>
             <li>
-              <button
-                onClick={() => setCurrentPage("contact")}
+              <Link
+                to="/contact"
                 className="hover:text-brand-orange"
                 data-track="footer-nav-contact"
               >
                 Contact Us
-              </button>
+              </Link>
             </li>
 
           </ul>
@@ -199,26 +186,26 @@ const Footer = ({ setCurrentPage }) => {
             </p>
           </div>
           <div className="flex flex-wrap gap-2 mt-2 md:mt-0 justify-center">
-            <span
-              onClick={() => setCurrentPage("privacy-policy")}
-              className="hover:text-brand-orange transition-colors cursor-pointer"
+            <Link
+              to="/privacy-policy"
+              className="hover:text-brand-orange transition-colors"
             >
               Privacy Policy
-            </span>
+            </Link>
             <span>|</span>
-            <span
-              onClick={() => setCurrentPage("terms-conditions")}
-              className="hover:text-brand-orange transition-colors cursor-pointer"
+            <Link
+              to="/terms-conditions"
+              className="hover:text-brand-orange transition-colors"
             >
               Terms & Conditions
-            </span>
+            </Link>
             <span>|</span>
-            <span
-              onClick={() => setCurrentPage("disclosure")}
-              className="hover:text-brand-orange transition-colors cursor-pointer"
+            <Link
+              to="/disclosure"
+              className="hover:text-brand-orange transition-colors"
             >
               Disclosure
-            </span>
+            </Link>
             <span>|</span>
             <a
               href="https://www.sebi.gov.in/filings/mutual-funds.html"

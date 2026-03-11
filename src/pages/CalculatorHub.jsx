@@ -1,9 +1,11 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calculator, TrendingUp, PiggyBank, Target, Home, Briefcase, GraduationCap, FileText, Dumbbell, PersonStanding, HeartHandshake, Hourglass, ShieldPlus, Activity } from 'lucide-react';
 import { SectionTitle } from '../components/ui';
 import { useAuth } from '../contexts/AuthContext';
 
-const CalculatorHub = ({ navigate = () => {} }) => {
+const CalculatorHub = () => {
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const calculators = [
     {
@@ -144,7 +146,7 @@ const CalculatorHub = ({ navigate = () => {} }) => {
           return (
             <div
               key={calc.id}
-              onClick={() => calc.available && navigate(calc.id)}
+              onClick={() => calc.available && navigate(`/${calc.id}`)}
               className={`bg-white p-8 rounded-xl shadow-sm border border-slate-100 transition-all group ${
                 calc.available 
                   ? 'hover:border-primary-green hover:shadow-lg cursor-pointer' 

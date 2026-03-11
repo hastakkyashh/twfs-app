@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, ArrowRight } from 'lucide-react';
 import { SectionTitle } from '../components/ui';
 
-const BlogsPage = ({ navigate }) => {
+const BlogsPage = () => {
+  const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -20,8 +22,7 @@ const BlogsPage = ({ navigate }) => {
   }, []);
 
   const handleBlogClick = (blogId) => {
-    window.location.hash = `blog-detail-${blogId}`;
-    navigate(`blog-detail-${blogId}`);
+    navigate(`/blogs/${blogId}`);
   };
 
   if (loading) {

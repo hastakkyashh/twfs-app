@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
 import { Menu, X, Phone, Mail } from "lucide-react";
 import {
   FaInstagram,
@@ -11,7 +12,10 @@ import {
 } from "react-icons/fa6";
 import { BRAND, NAV_LINKS } from "../../constants";
 
-const Header = ({ currentPage, setCurrentPage }) => {
+const Header = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
   const socialLinks = [
     { label: "Instagram", url: BRAND.instagram, icon: FaInstagram },
     { label: "X", url: BRAND.X, icon: FaXTwitter },
@@ -28,27 +32,23 @@ const Header = ({ currentPage, setCurrentPage }) => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const handleNavigation = (pageId) => {
-    setCurrentPage(pageId);
+  const handleNavigation = (path) => {
+    navigate(path);
     setMobileMenuOpen(false);
   };
 
   const handleCallNow = () => {
-    // Check if device is mobile
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     if (isMobile) {
-      // On mobile, open phone dialer
       window.location.href = `tel:+91${BRAND.phone}`;
     } else {
-      // On desktop, navigate to contact page
-      handleNavigation("contact");
+      handleNavigation("/contact");
     }
   };
 
   return (
     <>
-      {/* Top Bar */}
       <div className="bg-dark-green text-light-cream text-xs py-2 px-6 hidden md:block">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex gap-3 items-center">
@@ -78,33 +78,26 @@ const Header = ({ currentPage, setCurrentPage }) => {
         </div>
       </div>
 
-      {/* Navigation */}
       <header className="sticky top-0 z-50 bg-light-cream shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-          {/* --- LOGO SECTION CHANGES HERE --- */}
-          <div
-            className="flex flex-col items-center cursor-pointer"
-            onClick={() => handleNavigation("home")}
-          >
+          <Link to="/" className="flex flex-col items-center">
             <img src="logoTWFS.png" alt="Logo" className="h-20 w-auto" />
-          </div>
-          {/* --- END LOGO SECTION CHANGES --- */}
+          </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex gap-6 items-center">
             {NAV_LINKS.map((link) => (
-              <button
+              <NavLink
                 key={link.id}
-                onClick={() => handleNavigation(link.id)}
-                className={`text-base font-medium hover:text-primary-green transition-colors flex items-center gap-1 ${
-                  currentPage === link.id
+                to={link.id === 'home' ? '/' : `/${link.id}`}
+                className={({ isActive }) => `text-base font-medium hover:text-primary-green transition-colors flex items-center gap-1 ${
+                  isActive
                     ? "text-dark-green border-b-2 border-primary-green"
                     : "text-slate-600"
                 }`}
                 data-track={`header-nav-${link.id}`}
               >
                 {link.label}
-              </button>
+              </NavLink>
             ))}
             <button
               onClick={handleCallNow}
@@ -115,7 +108,6 @@ const Header = ({ currentPage, setCurrentPage }) => {
             </button>
           </nav>
 
-          {/* Mobile Menu Toggle */}
           <button
             className="md:hidden text-slate-800"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -124,23 +116,23 @@ const Header = ({ currentPage, setCurrentPage }) => {
           </button>
         </div>
 
-        {/* Mobile Nav Dropdown */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-light-cream border-t border-slate-100 absolute w-full shadow-lg">
             <div className="flex flex-col p-4">
               {NAV_LINKS.map((link) => (
-                <button
+                <NavLink
                   key={link.id}
-                  onClick={() => handleNavigation(link.id)}
-                  className={`text-left py-3 px-2 border-b border-slate-50 ${
-                    currentPage === link.id
+                  to={link.id === 'home' ? '/' : `/${link.id}`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={({ isActive }) => `text-left py-3 px-2 border-b border-slate-50 ${
+                    isActive
                       ? "text-dark-green font-bold bg-light-cream"
                       : "text-slate-600"
                   }`}
                   data-track={`header-nav-${link.id}`}
                 >
                   {link.label}
-                </button>
+                </NavLink>
               ))}
             </div>
           </div>

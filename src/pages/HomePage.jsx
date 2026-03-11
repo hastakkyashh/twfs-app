@@ -1,9 +1,20 @@
+/*
+[file] HomePage.jsx
+[role] Biz Logic for a specific view
+[description] 
+- Manages the state of the home page (hero section - card slider mouse hoverstate).
+- Handles navigation and authentication.
+- Provides authentication context to child components.
+*/
+
 import React, { useState, useEffect } from 'react';
-import { TrendingUp, Shield, PieChart, Sparkles, Target, Package, Award, UserCheck, Handshake, Smartphone, IndianRupee, Calendar, BarChart3 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { TrendingUp, Shield, Sparkles, Target, Package, Award, UserCheck, Handshake, Smartphone, IndianRupee, Calendar, BarChart3 } from 'lucide-react';
 import { Button } from '../components/ui';
 import { BRAND } from '../constants';
 
-const HomePage = ({ navigate }) => {
+const HomePage = () => {
+  const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -34,14 +45,13 @@ const HomePage = ({ navigate }) => {
             with Investment and Insurance.
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={() => {
-              window.open('http://p.njw.bz/97660', '_blank')}} variant="secondary" data-track="hero-cta-invest-now">
+            <Button onClick={() => {window.open('http://p.njw.bz/97660', '_blank')}} variant="secondary" data-track="hero-cta-invest-now">
               Invest Now
             </Button>
             <Button onClick={() => {window.open('https://www.pbpartners.com/v2/partner/truewise-finsure-nagpur-Tfr', '_blank')}} variant="secondary" data-track="hero-cta-insure-now">
               Insure Now
             </Button>
-            <Button onClick={() => navigate('ai-advisor')} variant="outline" className="border-white text-white hover:bg-white hover:text-dark-green" data-track="hero-cta-kubera-ai">
+            <Button onClick={() => navigate('/ai-advisor')} variant="outline" className="border-white text-white hover:bg-white hover:text-dark-green" data-track="hero-cta-kubera-ai">
               <Sparkles className="w-4 h-4" /> Ask Kubera AI
             </Button>
           </div>

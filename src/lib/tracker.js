@@ -135,7 +135,7 @@ class Tracker {
   track(eventType, data = {}) {
     const event = {
       event_type: eventType,
-      page: window.location.hash || '#home',
+      page: window.location.pathname || '/',
       element: data.element || null,
       metadata: data.metadata ? JSON.stringify(data.metadata) : null,
       timestamp: new Date().toISOString(),

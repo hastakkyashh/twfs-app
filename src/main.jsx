@@ -1,3 +1,11 @@
+/*
+[file] main.jsx
+[role] Application Entry Point
+[description] 
+- Initializes React and ReactDOM.
+- Sets up global styles and global providers.
+- Renders the application.
+*/
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
