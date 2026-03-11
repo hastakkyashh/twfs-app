@@ -5,7 +5,13 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true,        // Allows the tunnel to see the server (replaces --host flag)
-    allowedHosts: true
+    host: true,
+    allowedHosts: true,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8788',
+        changeOrigin: true,
+      }
+    }
   }
 })

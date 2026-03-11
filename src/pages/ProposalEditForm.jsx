@@ -976,28 +976,6 @@ const ProposalEditForm = () => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Illustrative Assumed Return
-                    </label>
-                    <input
-                      type="text"
-                      value={strategyDetails?.return || 0}
-                      readOnly
-                      className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-600 font-semibold"
-                    />
-                  </div>
-                  <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
-                    <p className="text-sm text-gray-800">
-                      <strong>
-                        The above allocation is indicative and may change based
-                        on market conditions and investor preference.
-                        Illustrative assumed return used only for calculation
-                        purposes
-                      </strong>
-                    </p>
-                  </div>
-                </div>
-                <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
                     Risk Profile
                   </label>
@@ -1007,6 +985,15 @@ const ProposalEditForm = () => {
                     readOnly
                     className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-600 font-semibold"
                   />
+                </div>
+                  <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                    <p className="text-sm text-gray-800">
+                      <strong>
+                        The above allocation is indicative and may change based
+                        on market conditions and investor preference. 
+                      </strong>
+                    </p>
+                  </div>
                 </div>
               </div>
             </section>
@@ -1065,9 +1052,6 @@ const ProposalEditForm = () => {
                       <th className="text-center p-3 font-semibold">
                         Weight (%)
                       </th>
-                      <th className="text-right p-3 font-semibold">
-                        Amount (₹)
-                      </th>
                       <th className="text-center p-3 font-semibold hide-in-print">
                         Actions
                       </th>
@@ -1124,14 +1108,6 @@ const ProposalEditForm = () => {
                             className="w-full px-2 py-1 border border-gray-300 rounded focus:border-blue-500 focus:outline-none text-center font-semibold"
                           />
                         </td>
-                        <td className="p-2">
-                          <input
-                            type="text"
-                            value={formatCurrency(fund.amount)}
-                            readOnly
-                            className="w-full px-2 py-1 border border-gray-200 rounded bg-gray-50 text-right text-gray-600"
-                          />
-                        </td>
                         <td className="p-2 text-center hide-in-print">
                           <button
                             onClick={() => handleRemoveFund(fund.id)}
@@ -1145,7 +1121,7 @@ const ProposalEditForm = () => {
                     {portfolioFunds.length === 0 && (
                       <tr>
                         <td
-                          colSpan="5"
+                          colSpan="4"
                           className="p-8 text-center text-gray-500"
                         >
                           No funds added yet. Click "Add Row" or "Search Funds"
@@ -1162,14 +1138,6 @@ const ProposalEditForm = () => {
                         </td>
                         <td className="p-3 text-center font-bold text-gray-900">
                           {totalAllocation.toFixed(2)}%
-                        </td>
-                        <td className="p-3 text-right font-bold text-gray-900">
-                          {formatCurrency(
-                            portfolioFunds.reduce(
-                              (sum, f) => sum + f.amount,
-                              0,
-                            ),
-                          )}
                         </td>
                         <td className="hide-in-print"></td>
                       </tr>
@@ -1500,7 +1468,6 @@ const ProposalEditForm = () => {
                       <th className="text-right p-3 font-semibold">
                         Wealth Gain
                       </th>
-                      <th className="text-right p-3 font-semibold">CAGR</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1521,6 +1488,7 @@ const ProposalEditForm = () => {
                           className={
                             index % 2 === 0 ? "bg-white" : "bg-gray-50"
                           }
+                          data-cagr={cagr}
                         >
                           <td className="p-3 text-center font-semibold text-gray-900">
                             {proj.year} Years
@@ -1535,15 +1503,12 @@ const ProposalEditForm = () => {
                             {formatCurrency(proj.probableAmount)}
                           </td>
                           <td className="p-3 text-right">
-                            <div className="font-semibold text-green-600">
-                              +{formatCurrency(gains)}
+                            <div className={`font-semibold ${gains >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {gains >= 0 ? '+' : ''}{formatCurrency(gains)}
                             </div>
-                            <div className="text-xs text-green-700 font-medium">
-                              ({gainPercentage}%)
+                            <div className={`text-xs font-medium ${gains >= 0 ? 'text-green-700' : 'text-red-700'}`}>
+                              ({gains >= 0 ? '+' : ''}{gainPercentage}%)
                             </div>
-                          </td>
-                          <td className="p-3 text-right font-bold text-purple-600">
-                            {cagr.toFixed(2)}%
                           </td>
                         </tr>
                       );
@@ -1570,8 +1535,16 @@ const ProposalEditForm = () => {
                     (totalGain / horizonProjection.totalInvestment) *
                     100
                   ).toFixed(2);
+                  const totalCAGR = selectedProjection.projections.reduce((sum, proj) => {
+                    const cagr = calculateCAGR(
+                      proj.totalInvestment,
+                      proj.probableAmount,
+                      proj.year,
+                    );
+                    return sum + cagr;
+                  }, 0);
                   return (
-                    <div className="mt-6 grid grid-cols-2 gap-4 mb-4">
+                    <div className="mt-6 grid grid-cols-3 gap-4 mb-4">
                       <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-400 rounded-lg p-5">
                         <div className="text-sm font-semibold text-blue-800 mb-2">
                           Total Investment at {formData.horizon} Years
@@ -1593,6 +1566,14 @@ const ProposalEditForm = () => {
                         <div className="text-xs text-green-700 mt-1">
                           Wealth Gain: +{formatCurrency(totalGain)} (
                           {totalGainPercentage}%)
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-400 rounded-lg p-5">
+                        <div className="text-sm font-semibold text-orange-800 mb-2">
+                          Total CAGR
+                        </div>
+                        <div className="text-3xl font-bold text-orange-900">
+                          {totalCAGR.toFixed(2)}%
                         </div>
                       </div>
                     </div>

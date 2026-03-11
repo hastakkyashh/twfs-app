@@ -108,27 +108,57 @@ export const InputField = ({
   suffix = '',
   prefix = ''
 }) => {
+  // Handle typing or slider movement
+  const handleInputChange = (e) => {
+    const val = e.target.value;
+    onChange(val === '' ? '' : Number(val));
+  };
+
+  // Enforce min/max bounds when the user clicks away from the input field
+  const handleBlur = () => {
+    if (value === '' || value < min) {
+      onChange(min);
+    } else if (value > max) {
+      onChange(max);
+    }
+  };
+
+  // Safe calculations for the custom visual slider elements
+  const safeValue = value === '' ? min : Number(value);
+  const percentage = ((safeValue - min) * 100) / (max - min);
+  const clampedPercentage = Math.max(0, Math.min(100, percentage)); // Prevents UI break if manually typed over max
+
   return (
     <div className="mb-8">
-      {/* Label and Value Row */}
+      {/* Label and Editable Value Row */}
       <div className="flex justify-between items-center mb-4">
         <label className="text-slate-700 font-medium text-lg">{label}</label>
-        <div className="bg-green-50 px-4 py-2 rounded-lg text-emerald-500 font-bold text-xl min-w-[120px] text-right">
-          {prefix}{value.toLocaleString('en-IN')}{suffix}
+        <div className="flex items-center bg-green-50 px-4 py-2 rounded-lg text-emerald-500 font-bold text-xl min-w-[120px] focus-within:ring-2 focus-within:ring-emerald-400 transition-shadow">
+          {prefix && <span className="mr-1">{prefix}</span>}
+          <input
+            type="number"
+            value={value}
+            onChange={handleInputChange}
+            onBlur={handleBlur}
+            min={min}
+            max={max}
+            step={step}
+            className="w-full bg-transparent outline-none text-right appearance-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+          />
+          {suffix && <span className="ml-1">{suffix}</span>}
         </div>
       </div>
 
       {/* Custom Range Slider */}
-      <div className="relative w-full h-6 flex items-center">
+      <div className="relative w-full h-6 flex items-center group">
         <input 
           type="range" 
           min={min}
           max={max}
           step={step}
-          value={value} 
-          onChange={(e) => onChange(Number(e.target.value))}
+          value={safeValue} 
+          onChange={handleInputChange}
           className="w-full absolute z-20 opacity-0 cursor-pointer h-full" 
-          // The invisible input sits on top to capture clicks
         />
         
         {/* Visual Track */}
@@ -136,14 +166,14 @@ export const InputField = ({
         
         {/* Visual Progress Fill */}
         <div 
-          className="absolute h-1 bg-emerald-500 rounded-full z-10"
-          style={{ width: `${((value - min) * 100) / (max - min)}%` }}
+          className="absolute h-1 bg-emerald-500 rounded-full z-10 transition-all duration-75"
+          style={{ width: `${clampedPercentage}%` }}
         ></div>
         
         {/* Visual Thumb (Circle) */}
         <div 
-          className="absolute h-6 w-6 bg-white border-4 border-emerald-500 rounded-full z-10 shadow-md transform -translate-x-1/2"
-          style={{ left: `${((value - min) * 100) / (max - min)}%` }}
+          className="absolute h-6 w-6 bg-white border-4 border-emerald-500 rounded-full z-10 shadow-md transform -translate-x-1/2 group-hover:scale-110 transition-transform duration-150"
+          style={{ left: `${clampedPercentage}%` }}
         ></div>
       </div>
     </div>

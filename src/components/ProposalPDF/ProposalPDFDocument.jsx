@@ -221,6 +221,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#4ade80",
   },
+  summaryBoxOrange: {
+    backgroundColor: "#fff7ed",
+    borderWidth: 1,
+    borderColor: "#fb923c",
+  },
   summaryLabel: {
     fontSize: 8,
     fontFamily: "Helvetica-Bold",
@@ -542,17 +547,13 @@ const ProposalPDFDocument = ({
           </View>
           <View style={styles.row}>
             <View style={styles.col2}>
-              <Text style={styles.label}>Illustrative Assumed Return</Text>
-              <Text style={styles.value}>{strategyDetails?.return || 0}%</Text>
-            </View>
-            <View style={styles.col2}>
               <Text style={styles.label}>Risk Profile</Text>
               <Text style={styles.value}>{strategyDetails?.riskProfile || "N/A"}</Text>
             </View>
           </View>
           <View style={styles.warningBox}>
             <Text style={styles.warningText}>
-              The above allocation is indicative and may change based on market conditions and investor preference. Illustrative assumed return used only for calculation purposes.
+              The above allocation is indicative and may change based on market conditions and investor preference.
             </Text>
           </View>
         </View>
@@ -576,29 +577,24 @@ const ProposalPDFDocument = ({
 
           <View style={styles.table}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { width: "40%" }]}>Fund Name</Text>
-              <Text style={[styles.tableHeaderCell, { width: "25%", textAlign: "center" }]}>Category</Text>
-              <Text style={[styles.tableHeaderCell, { width: "15%", textAlign: "center" }]}>Weight (%)</Text>
-              <Text style={[styles.tableHeaderCell, { width: "20%", textAlign: "right" }]}>Amount (₹)</Text>
+              <Text style={[styles.tableHeaderCell, { width: "50%" }]}>Fund Name</Text>
+              <Text style={[styles.tableHeaderCell, { width: "30%", textAlign: "center" }]}>Category</Text>
+              <Text style={[styles.tableHeaderCell, { width: "20%", textAlign: "center" }]}>Weight (%)</Text>
             </View>
             {portfolioFunds?.map((fund, index) => (
               <View 
                 key={fund.id} 
                 style={[styles.tableRow, index % 2 === 1 && styles.tableRowAlt]}
               >
-                <Text style={[styles.tableCell, { width: "40%" }]}>{fund.fundName || "N/A"}</Text>
-                <Text style={[styles.tableCell, { width: "25%", textAlign: "center" }]}>{fund.category || "N/A"}</Text>
-                <Text style={[styles.tableCellBold, { width: "15%", textAlign: "center" }]}>{fund.allocationPercentage || 0}</Text>
-                <Text style={[styles.tableCell, { width: "20%", textAlign: "right" }]}>{formatCurrency(fund.amount || 0)}</Text>
+                <Text style={[styles.tableCell, { width: "50%" }]}>{fund.fundName || "N/A"}</Text>
+                <Text style={[styles.tableCell, { width: "30%", textAlign: "center" }]}>{fund.category || "N/A"}</Text>
+                <Text style={[styles.tableCellBold, { width: "20%", textAlign: "center" }]}>{fund.allocationPercentage || 0}</Text>
               </View>
             ))}
             {portfolioFunds?.length > 0 && (
               <View style={styles.tableFooter}>
-                <Text style={[styles.tableCellBold, { width: "65%" }]}>Total Portfolio</Text>
-                <Text style={[styles.tableCellBold, { width: "15%", textAlign: "center" }]}>{totalAllocation?.toFixed(2) || 0}%</Text>
-                <Text style={[styles.tableCellBold, { width: "20%", textAlign: "right" }]}>
-                  {formatCurrency(portfolioFunds?.reduce((sum, f) => sum + (f.amount || 0), 0) || 0)}
-                </Text>
+                <Text style={[styles.tableCellBold, { width: "80%" }]}>Total Portfolio</Text>
+                <Text style={[styles.tableCellBold, { width: "20%", textAlign: "center" }]}>{totalAllocation?.toFixed(2) || 0}%</Text>
               </View>
             )}
           </View>
@@ -661,8 +657,8 @@ const ProposalPDFDocument = ({
         {/* CAGR Returns */}
         <View style={styles.section}>
           <View style={styles.table}>
-            <View style={styles.tableHeaderAlt}>
-              <Text style={[styles.tableHeaderCellAlt, { width: "30%" }]}>Fund Name</Text>
+            <View style={styles.tableHeaderAlt}>  
+              <Text style={[styles.tableHeaderCellAlt, { width: "40%" }]}>Fund Name</Text>
               <Text style={[styles.tableHeaderCellAlt, { width: "17.5%", textAlign: "center" }]}>3Y CAGR (%)</Text>
               <Text style={[styles.tableHeaderCellAlt, { width: "17.5%", textAlign: "center" }]}>5Y CAGR (%)</Text>
               <Text style={[styles.tableHeaderCellAlt, { width: "17.5%", textAlign: "center" }]}>10Y CAGR (%)</Text>
@@ -707,11 +703,10 @@ const ProposalPDFDocument = ({
           
           <View style={styles.table}>
             <View style={styles.tableHeader}>
-              <Text style={[styles.tableHeaderCell, { width: "15%", textAlign: "center" }]}>Year</Text>
-              <Text style={[styles.tableHeaderCell, { width: "22%", textAlign: "right" }]}>Total Investment</Text>
-              <Text style={[styles.tableHeaderCell, { width: "22%", textAlign: "right" }]}>Probable Value</Text>
+              <Text style={[styles.tableHeaderCell, { width: "20%", textAlign: "center" }]}>Year</Text>
+              <Text style={[styles.tableHeaderCell, { width: "27%", textAlign: "right" }]}>Total Investment</Text>
+              <Text style={[styles.tableHeaderCell, { width: "27%", textAlign: "right" }]}>Probable Value</Text>
               <Text style={[styles.tableHeaderCell, { width: "26%", textAlign: "right" }]}>Wealth Gain</Text>
-              <Text style={[styles.tableHeaderCell, { width: "15%", textAlign: "right" }]}>CAGR</Text>
             </View>
             {selectedProjection?.projections?.map((proj, index) => {
               const gains = proj.probableAmount - proj.totalInvestment;
@@ -722,11 +717,10 @@ const ProposalPDFDocument = ({
                   key={proj.year} 
                   style={[styles.tableRow, index % 2 === 1 && styles.tableRowAlt]}
                 >
-                  <Text style={[styles.tableCellBold, { width: "15%", textAlign: "center" }]}>{proj.year} Years</Text>
-                  <Text style={[styles.tableCell, { width: "22%", textAlign: "right" }]}>{formatCurrency(proj.totalInvestment)}</Text>
-                  <Text style={[styles.tableCellBold, styles.greenText, { width: "22%", textAlign: "right" }]}>{formatCurrency(proj.probableAmount)}</Text>
-                  <Text style={[styles.tableCell, { width: "26%", textAlign: "right" }]}>+{formatCurrency(gains)} ({gainPercentage}%)</Text>
-                  <Text style={[styles.tableCellBold, styles.purpleText, { width: "15%", textAlign: "right" }]}>{cagr.toFixed(2)}%</Text>
+                  <Text style={[styles.tableCellBold, { width: "20%", textAlign: "center" }]}>{proj.year} Years</Text>
+                  <Text style={[styles.tableCell, { width: "27%", textAlign: "right" }]}>{formatCurrency(proj.totalInvestment)}</Text>
+                  <Text style={[styles.tableCellBold, styles.greenText, { width: "27%", textAlign: "right" }]}>{formatCurrency(proj.probableAmount)}</Text>
+                  <Text style={[styles.tableCell, { width: "26%", textAlign: "right", color: gains >= 0 ? "#16a34a" : "#dc2626" }]}>{gains >= 0 ? '+' : ''}{formatCurrency(gains)} ({gains >= 0 ? '+' : ''}{gainPercentage}%)</Text>
                 </View>
               );
             })}
@@ -739,6 +733,10 @@ const ProposalPDFDocument = ({
             ) || selectedProjection.projections[selectedProjection.projections.length - 1];
             const totalGain = horizonProjection.probableAmount - horizonProjection.totalInvestment;
             const totalGainPercentage = ((totalGain / horizonProjection.totalInvestment) * 100).toFixed(2);
+            const totalCAGR = selectedProjection.projections.reduce((sum, proj) => {
+              const cagr = calculateCAGR(proj.totalInvestment, proj.probableAmount, proj.year);
+              return sum + cagr;
+            }, 0);
             return (
               <View style={styles.summaryGrid}>
                 <View style={[styles.summaryBox, styles.summaryBoxBlue]}>
@@ -752,7 +750,7 @@ const ProposalPDFDocument = ({
                     Lumpsum + SIP contributions
                   </Text>
                 </View>
-                <View style={[styles.summaryBox, styles.summaryBoxGreen, { marginRight: 0 }]}>
+                <View style={[styles.summaryBox, styles.summaryBoxGreen]}>
                   <Text style={[styles.summaryLabel, { color: "#166534" }]}>
                     Probable Value at {formData?.horizon} Years
                   </Text>
@@ -761,6 +759,14 @@ const ProposalPDFDocument = ({
                   </Text>
                   <Text style={[styles.summarySubtext, { color: "#15803d" }]}>
                     Wealth Gain: +{formatCurrency(totalGain)} ({totalGainPercentage}%)
+                  </Text>
+                </View>
+                <View style={[styles.summaryBox, styles.summaryBoxOrange, { marginRight: 0 }]}>
+                  <Text style={[styles.summaryLabel, { color: "#c2410c" }]}>
+                    Total CAGR
+                  </Text>
+                  <Text style={[styles.summaryValue, { color: "#9a3412" }]}>
+                    {totalCAGR.toFixed(2)}%
                   </Text>
                 </View>
               </View>

@@ -67,8 +67,8 @@ const ResultStep = ({ formData, updateFormData, onPrev }) => {
     
     sessionStorage.setItem('proposalFormData', JSON.stringify(proposalData));
     const url = viewType === 'edit' 
-      ? `${window.location.origin}/#proposal-edit-form`
-      : `${window.location.origin}/#proposal-preview`;
+      ? `${window.location.origin}/proposal-edit-form`
+      : `${window.location.origin}/proposal-preview`;
     window.open(url, '_blank');
   };
 
