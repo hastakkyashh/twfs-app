@@ -126,6 +126,9 @@ const calculateReturns = (data) => {
     { label: '3Y', years: 3, months: 0 },
     { label: '5Y', years: 5, months: 0 },
     { label: '10Y', years: 10, months: 0 },
+    { label: '15Y', years: 15, months: 0 },
+    { label: '20Y', years: 20, months: 0 },
+    { label: '25Y', years: 25, months: 0 },
   ];
 
   const results = {};
@@ -224,6 +227,9 @@ export const getFundDetails = async (symbol) => {
       return3Y: returns['3Y'],
       return5Y: returns['5Y'],
       return10Y: returns['10Y'],
+      return15Y: returns['15Y'],
+      return20Y: returns['20Y'],
+      return25Y: returns['25Y'],
       returnSinceInception: returns['Since Inception'],
       
       category: mfData.meta.scheme_category || 'N/A',

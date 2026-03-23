@@ -54,23 +54,43 @@ export const calculateSIPTenure = (targetAmount, monthlyInvest, rate) => {
   };
 };
 
-export const calculateStepUpSIP = (initialInvest, years, rate, stepUpPercentage) => {
-  let currentInvest = initialInvest;
+export const calculateStepUpSIP = (initialInvest, years, rate, stepUpValue, stepUpType = 'percentage') => {
+  const r = rate / 100;
+  // FIXED: Use geometric effective monthly rate, not simple division (nominal rate).
+  // (1+r)^(1/12) - 1 ensures time-value consistency across all compounding steps.
+  const i = Math.pow(1 + r, 1 / 12) - 1;
+
+  const calculateCurrentSIP = (year) => {
+    if (stepUpType === 'amount') {
+      return initialInvest + (year * stepUpValue);
+    } else {
+      return initialInvest * Math.pow(1 + stepUpValue / 100, year);
+    }
+  };
+
   let totalValue = 0;
   let totalInvested = 0;
-  const monthlyRate = rate / 12 / 100;
 
-  for (let y = 1; y <= years; y++) {
-    // For each year (12 months)
-    // FV for this year's specific SIP series
-    // We calculate the FV of this year's contribution at the END of the total tenure
-    // Actually, easier approach: Iterative compounding
-    for (let m = 1; m <= 12; m++) {
-        totalValue = (totalValue + currentInvest) * (1 + monthlyRate);
-        totalInvested += currentInvest;
+  for (let year = 0; year < years; year++) {
+    const currentSIP = calculateCurrentSIP(year);
+
+    if (i === 0) {
+      totalValue += currentSIP * 12;
+    } else {
+      // Step 1: Annuity-Due FV for this year's 12 installments
+      // Formula: P * [((1+i)^12 - 1) / i] * (1+i)
+      const yearlyBlockFV = currentSIP * ((Math.pow(1 + i, 12) - 1) / i) * (1 + i);
+
+      // Step 2: FIXED — compound to end using effective monthly rate (same basis).
+      // Using (1+i)^(remainingMonths) instead of (1+r)^(remainingYears) avoids
+      // the rate-basis mismatch that caused ~0.3-0.5% drift in final wealth.
+      const remainingMonths = (years - year - 1) * 12;
+      const compoundedToEnd = yearlyBlockFV * Math.pow(1 + i, remainingMonths);
+
+      totalValue += compoundedToEnd;
     }
-    // Increase SIP for next year
-    currentInvest = currentInvest * (1 + stepUpPercentage / 100);
+
+    totalInvested += currentSIP * 12;
   }
 
   return {
