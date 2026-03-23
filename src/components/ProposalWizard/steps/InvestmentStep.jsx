@@ -2,7 +2,7 @@
 // Investment Step
 
 import React from 'react';
-import { IndianRupee , TrendingUp, ArrowRight, ArrowLeft } from 'lucide-react';
+import { IndianRupee , TrendingUp, ArrowRight, ArrowLeft, Percent } from 'lucide-react';
 
 const InvestmentStep = ({ formData, updateFormData, onNext, onPrev }) => {
   const handleSubmit = (e) => {
@@ -77,7 +77,7 @@ const InvestmentStep = ({ formData, updateFormData, onNext, onPrev }) => {
                   onChange={(e) => updateFormData('monthlySIP', parseFloat(e.target.value) || 0)}
                   placeholder="0"
                   min="0"
-                  step="500"
+                  step="100"
                   className="w-full pl-8 pr-4 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg"
                   style={{ borderColor: '#e5e7eb' }}
                   onFocus={(e) => e.currentTarget.style.borderColor = '#73b030'}
@@ -92,30 +92,80 @@ const InvestmentStep = ({ formData, updateFormData, onNext, onPrev }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Annual Step-up Percentage (%)
-              </label>
+              <div className="flex items-center justify-between mb-3">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Annual Step-up
+                </label>
+                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                  <button
+                    type="button"
+                    onClick={() => updateFormData('stepUpType', 'percentage')}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      formData.stepUpType === 'percentage'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    %
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updateFormData('stepUpType', 'amount')}
+                    className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
+                      formData.stepUpType === 'amount'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    ₹
+                  </button>
+                </div>
+              </div>
               <div className="relative">
-                <TrendingUp className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
-                <input
-                  type="number"
-                  value={formData.stepUpPercentage || ''}
-                  onChange={(e) => updateFormData('stepUpPercentage', parseFloat(e.target.value) || 0)}
-                  placeholder="0"
-                  min="0"
-                  max="50"
-                  step="1"
-                  className="w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg"
-                  style={{ borderColor: '#e5e7eb' }}
-                  onFocus={(e) => e.currentTarget.style.borderColor = '#73b030'}
-                  onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
-                  %
-                </span>
+                {formData.stepUpType === 'percentage' ? (
+                  <>
+                    <Percent className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                    <input
+                      type="number"
+                      value={formData.stepUpValue || ''}
+                      onChange={(e) => updateFormData('stepUpValue', parseFloat(e.target.value) || 0)}
+                      placeholder="0"
+                      min="0"
+                      max="50"
+                      step="1"
+                      className="w-full pl-12 pr-12 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg"
+                      style={{ borderColor: '#e5e7eb' }}
+                      onFocus={(e) => e.currentTarget.style.borderColor = '#73b030'}
+                      onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
+                    />
+                    <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500">
+                      %
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+                    <input
+                      type="number"
+                      value={formData.stepUpValue || ''}
+                      onChange={(e) => updateFormData('stepUpValue', parseFloat(e.target.value) || 0)}
+                      placeholder="0"
+                      min="100"
+                      max="50000"
+                      step="100"
+                      className="w-full pl-12 pr-4 py-3 border-2 rounded-lg focus:outline-none transition-colors text-lg"
+                      style={{ borderColor: '#e5e7eb' }}
+                      onFocus={(e) => e.currentTarget.style.borderColor = '#73b030'}
+                      onBlur={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
+                    />
+                  </>
+                )}
               </div>
               <p className="mt-1 text-sm text-gray-500">
-                Your SIP amount will increase by this percentage annually
+                {formData.stepUpType === 'percentage' 
+                  ? 'Your SIP amount will increase by this percentage annually'
+                  : 'Your SIP amount will increase by this amount annually'
+                }
               </p>
             </div>
           </div>
@@ -125,7 +175,7 @@ const InvestmentStep = ({ formData, updateFormData, onNext, onPrev }) => {
             <div className="space-y-1 text-sm" style={{ color: '#337b1c' }}>
               <p>Initial Investment: {formatCurrency(formData.lumpsum)}</p>
               <p>Monthly SIP: {formatCurrency(formData.monthlySIP)}</p>
-              <p>Annual Step-up: {formData.stepUpPercentage}%</p>
+              <p>Annual Step-up: {formData.stepUpType === 'percentage' ? `${formData.stepUpValue}%` : formatCurrency(formData.stepUpValue)}</p>
             </div>
           </div>
 

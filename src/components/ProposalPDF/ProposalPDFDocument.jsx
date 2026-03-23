@@ -222,9 +222,9 @@ const styles = StyleSheet.create({
     borderColor: "#4ade80",
   },
   summaryBoxOrange: {
-    backgroundColor: "#fff7ed",
+    backgroundColor: "#fef3c7",
     borderWidth: 1,
-    borderColor: "#fb923c",
+    borderColor: "#fbbf24",
   },
   summaryLabel: {
     fontSize: 8,
@@ -518,16 +518,21 @@ const ProposalPDFDocument = ({
           <Text style={styles.sectionTitle}>Investment Details</Text>
           <View style={styles.row}>
             <View style={styles.col2}>
-              <Text style={styles.label}>Lumpsum Amount (₹)</Text>
+              <Text style={styles.label}>Lumpsum Amount (Rs.)</Text>
               <Text style={styles.value}>{formatCurrency(formData?.lumpsum || 0)}</Text>
             </View>
             <View style={styles.col2}>
-              <Text style={styles.label}>Monthly SIP (₹)</Text>
+              <Text style={styles.label}>Monthly SIP (Rs.)</Text>
               <Text style={styles.value}>{formatCurrency(formData?.monthlySIP || 0)}</Text>
             </View>
             <View style={styles.col2}>
-              <Text style={styles.label}>Step-up (%)</Text>
-              <Text style={styles.value}>{formData?.stepUpPercentage || 0}%</Text>
+              <Text style={styles.label}>Step-up</Text>
+              <Text style={styles.value}>
+                {formData?.stepUpType === 'amount' 
+                  ? `Rs. ${formData?.stepUpValue || 0}` 
+                  : `${formData?.stepUpValue || 0}%`
+                }
+              </Text>
             </View>
           </View>
         </View>
@@ -607,7 +612,7 @@ const ProposalPDFDocument = ({
           <View style={styles.table}>
             <View style={styles.tableHeaderAlt}>
               <Text style={[styles.tableHeaderCellAlt, { width: "50%" }]}>Fund Name</Text>
-              <Text style={[styles.tableHeaderCellAlt, { width: "25%", textAlign: "center" }]}>NAV (₹)</Text>
+              <Text style={[styles.tableHeaderCellAlt, { width: "25%", textAlign: "center" }]}>NAV (Rs.)</Text>
               <Text style={[styles.tableHeaderCellAlt, { width: "25%", textAlign: "center" }]}>NAV Date</Text>
             </View>
             {portfolioFunds?.map((fund, index) => (
@@ -711,7 +716,8 @@ const ProposalPDFDocument = ({
             {selectedProjection?.projections?.map((proj, index) => {
               const gains = proj.probableAmount - proj.totalInvestment;
               const gainPercentage = ((gains / proj.totalInvestment) * 100).toFixed(2);
-              const cagr = calculateCAGR(proj.totalInvestment, proj.probableAmount, proj.year);
+              // Use the CAGR value that was already calculated in ProposalEditForm
+              // Don't recalculate here - just display the value
               return (
                 <View 
                   key={proj.year} 
@@ -728,15 +734,23 @@ const ProposalPDFDocument = ({
 
           {/* Summary Boxes */}
           {selectedProjection?.projections?.length > 0 && (() => {
+            // Use the same calculation logic as ProposalEditForm
             const horizonProjection = selectedProjection.projections.find(
               (p) => p.year === formData?.horizon
             ) || selectedProjection.projections[selectedProjection.projections.length - 1];
+            
             const totalGain = horizonProjection.probableAmount - horizonProjection.totalInvestment;
             const totalGainPercentage = ((totalGain / horizonProjection.totalInvestment) * 100).toFixed(2);
-            const totalCAGR = selectedProjection.projections.reduce((sum, proj) => {
-              const cagr = calculateCAGR(proj.totalInvestment, proj.probableAmount, proj.year);
-              return sum + cagr;
-            }, 0);
+            
+            // Use the same CAGR calculation as ProposalEditForm
+            // Calculate one overall CAGR for the entire period
+            // Passing Total Investment as 'initialValue' and Probable Amount as 'finalValue'
+            const totalCAGR = calculateCAGR(
+              horizonProjection.totalInvestment, 
+              horizonProjection.probableAmount, 
+              formData?.horizon
+            );
+
             return (
               <View style={styles.summaryGrid}>
                 <View style={[styles.summaryBox, styles.summaryBoxBlue]}>
@@ -762,11 +776,14 @@ const ProposalPDFDocument = ({
                   </Text>
                 </View>
                 <View style={[styles.summaryBox, styles.summaryBoxOrange, { marginRight: 0 }]}>
-                  <Text style={[styles.summaryLabel, { color: "#c2410c" }]}>
+                  <Text style={[styles.summaryLabel, { color: "#975a16" }]}>
                     Total CAGR
                   </Text>
-                  <Text style={[styles.summaryValue, { color: "#9a3412" }]}>
+                  <Text style={[styles.summaryValue, { color: "#975a16" }]}>
                     {totalCAGR.toFixed(2)}%
+                  </Text>
+                  <Text style={[styles.summarySubtext, { color: "#b7791f" }]}>
+                    Based on Total Invested
                   </Text>
                 </View>
               </View>
