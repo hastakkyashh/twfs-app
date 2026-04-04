@@ -81,7 +81,7 @@ const Header = () => {
       <header className="sticky top-0 z-50 bg-light-cream shadow-md">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link to="/" className="flex flex-col items-center">
-            <img src="logoTWFS.png" alt="Logo" className="h-20 w-auto" />
+            <img src="logoTWFS.webp" alt="Logo" className="h-20 w-auto" />
           </Link>
 
           <nav className="hidden md:flex gap-6 items-center">

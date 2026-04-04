@@ -762,7 +762,7 @@ const ProposalEditForm = () => {
           <div className="print-only bg-white p-8 pb-4">
             <div className="text-center mb-8">
               <img
-                src="/logoTWFS.png"
+                src="/logoTWFS.webp"
                 alt="TrueWise FinSure"
                 className="h-24 mx-auto mb-6 object-contain"
               />

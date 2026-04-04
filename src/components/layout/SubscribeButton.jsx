@@ -12,7 +12,7 @@ const SubscribeButton = ({ onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="fixed bottom-12 left-6 bg-brand-orange hover:bg-brand-gold text-white p-4 rounded-full shadow-2xl transition-all z-40 flex items-center justify-center group animate-bounce"
+      className="fixed bottom-12 left-6 bg-brand-orange hover:bg-brand-gold text-white p-4 rounded-full shadow-2xl transition-all z-50 flex items-center justify-center group animate-bounce"
       aria-label="Subscribe to newsletter"
       data-track="subscribe-fab-btn"
     >
