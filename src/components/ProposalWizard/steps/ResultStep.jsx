@@ -14,7 +14,7 @@ const ResultStep = ({ formData, updateFormData, onPrev }) => {
   useEffect(() => {
     if (!showConfig && strategies.length > 0) {
       // Ensure formData has required fields
-      if (formData.lumpsum !== undefined && formData.monthlySIP !== undefined && formData.stepUpPercentage !== undefined) {
+      if (formData.lumpsum !== undefined && formData.monthlySIP !== undefined && formData.stepUpValue !== undefined && formData.stepUpType !== undefined) {
         // console.log('Calculating projections with strategies:', strategies);
         // console.log('FormData:', formData);
         const calculatedProjections = calculateProjections(formData, strategies);
@@ -110,7 +110,7 @@ const ResultStep = ({ formData, updateFormData, onPrev }) => {
                 <div className="bg-white rounded-lg p-4">
                   <p className="text-sm text-gray-600 mb-1">Annual Step-up</p>
                   <p className="text-xl font-bold text-gray-900">
-                    {formData.stepUpPercentage}%
+                    {formData.stepUpType === 'percentage' ? `${formData.stepUpValue}%` : formatCurrency(formData.stepUpValue)}
                   </p>
                 </div>
               </div>

@@ -1,4 +1,3 @@
-
 /*
 [Description]
 - main component that holds the state of the complete proposal
@@ -99,7 +98,8 @@ const ProposalEditForm = () => {
     portfolioFunds,
     formData?.lumpsum,
     formData?.monthlySIP,
-    formData?.stepUpPercentage,
+    formData?.stepUpValue,
+    formData?.stepUpType,
     formData?.horizon,
   ]);
 
@@ -147,7 +147,8 @@ const ProposalEditForm = () => {
         const fundFV = calculateFutureValue(
           fundLumpsum,
           fundSIP,
-          formData.stepUpPercentage,
+          formData.stepUpValue,
+          formData.stepUpType,
           year,
           rate,
         );
@@ -158,7 +159,8 @@ const ProposalEditForm = () => {
       const totalInvestment = calculateTotalInvestment(
         formData.lumpsum,
         formData.monthlySIP,
-        formData.stepUpPercentage,
+        formData.stepUpValue,
+        formData.stepUpType,
         year,
       );
 
@@ -181,7 +183,8 @@ const ProposalEditForm = () => {
         const probableAmount = calculateFutureValue(
           formData.lumpsum,
           formData.monthlySIP,
-          formData.stepUpPercentage,
+          formData.stepUpValue,
+          formData.stepUpType,
           year,
           returnRate,
         );
@@ -189,7 +192,8 @@ const ProposalEditForm = () => {
         const totalInvestment = calculateTotalInvestment(
           formData.lumpsum,
           formData.monthlySIP,
-          formData.stepUpPercentage,
+          formData.stepUpValue,
+          formData.stepUpType,
           year,
         );
 
@@ -243,12 +247,24 @@ const ProposalEditForm = () => {
   };
 
   const handleAddFund = (fundData) => {
+    // Calculate equal allocation: existing funds keep their share, new fund gets an equal split
+    const existingCount = portfolioFunds.length;
+    const newCount = existingCount + 1;
+    const equalShare = parseFloat((100 / newCount).toFixed(2));
+
+    // Rebalance existing funds proportionally
+    const rebalancedFunds = portfolioFunds.map((fund) => ({
+      ...fund,
+      allocationPercentage: equalShare,
+      amount: parseFloat(((formData.lumpsum * equalShare) / 100).toFixed(2)),
+    }));
+
     const newFund = {
       id: fundData.symbol || `fund-${Date.now()}`,
       fundName: fundData.schemeName || fundData.name || "",
       category: fundData.schemeCategory || fundData.category || "",
-      allocationPercentage: 0,
-      amount: 0,
+      allocationPercentage: equalShare,
+      amount: parseFloat(((formData.lumpsum * equalShare) / 100).toFixed(2)),
       nav: fundData.nav || 0,
       navDate: fundData.navDate || "",
       metrics: {
@@ -265,6 +281,12 @@ const ProposalEditForm = () => {
           fundData.return5Y !== null ? parseFloat(fundData.return5Y) : 0,
         return10Y:
           fundData.return10Y !== null ? parseFloat(fundData.return10Y) : 0,
+        return15Y:
+          fundData.return15Y !== null ? parseFloat(fundData.return15Y) : 0,
+        return20Y:
+          fundData.return20Y !== null ? parseFloat(fundData.return20Y) : 0,
+        return25Y:
+          fundData.return25Y !== null ? parseFloat(fundData.return25Y) : 0,
         returnSinceInception:
           fundData.returnSinceInception !== null
             ? parseFloat(fundData.returnSinceInception)
@@ -278,7 +300,7 @@ const ProposalEditForm = () => {
         smallCap: parseFloat(fundData.smallCap) || 0,
       },
     };
-    setPortfolioFunds([...portfolioFunds, newFund]);
+    setPortfolioFunds([...rebalancedFunds, newFund]);
   };
 
   const handleAddEmptyFund = () => {
@@ -382,12 +404,13 @@ const ProposalEditForm = () => {
       );
       return;
     }
-    
+
     setIsGeneratingPDF(true);
-    
+
     try {
       const riskAppetiteValue = getRiskAppetite(formData.horizon);
-      const strategyDetailsValue = editableStrategy || formData.selectedStrategyDetails;
+      const strategyDetailsValue =
+        editableStrategy || formData.selectedStrategyDetails;
       const selectedProjectionValue = editableProjections
         ? { projections: editableProjections }
         : formData.selectedProjectionData;
@@ -737,10 +760,12 @@ const ProposalEditForm = () => {
                 className="px-6 py-2 text-white rounded-lg font-semibold transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 style={{ backgroundColor: "#73b030" }}
                 onMouseEnter={(e) =>
-                  !isGeneratingPDF && (e.currentTarget.style.backgroundColor = "#337b1c")
+                  !isGeneratingPDF &&
+                  (e.currentTarget.style.backgroundColor = "#337b1c")
                 }
                 onMouseLeave={(e) =>
-                  !isGeneratingPDF && (e.currentTarget.style.backgroundColor = "#73b030")
+                  !isGeneratingPDF &&
+                  (e.currentTarget.style.backgroundColor = "#73b030")
                 }
               >
                 {isGeneratingPDF ? (
@@ -773,9 +798,7 @@ const ProposalEditForm = () => {
                 Mutual Fund Illustrative Investment Proposal
               </h1>
               <div className="text-gray-600 text-md">
-                <p>
-                  Prepared by an AMFI Registered Mutual Fund Distributor.
-                </p>
+                <p>Prepared by an AMFI Registered Mutual Fund Distributor.</p>
                 <p>
                   This document is for informational & distribution purposes{" "}
                   <br />
@@ -870,8 +893,8 @@ const ProposalEditForm = () => {
                   <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
                     <p className="text-sm text-gray-800">
                       <strong>
-                        Asset Allocation Strategy is based on client self-assessment and is
-                        indicative in nature.
+                        Asset Allocation Strategy is based on client
+                        self-assessment and is indicative in nature.
                       </strong>
                     </p>
                   </div>
@@ -921,20 +944,42 @@ const ProposalEditForm = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Step-up (%)
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Annual Step-up
+                    </label>
+                    <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                      <div
+                        className={`px-3 py-1 rounded-md text-sm font-medium ${
+                          formData.stepUpType === "percentage"
+                            ? "bg-white text-gray-900 shadow-sm"
+                            : "bg-white text-gray-900 shadow-sm"
+                        }`}
+                      >
+                        {formData.stepUpType === "percentage" ? "%" : "₹"}
+                      </div>
+                    </div>
+                  </div>
                   <input
                     type="number"
-                    value={formData.stepUpPercentage}
+                    value={formData.stepUpValue}
                     onChange={(e) =>
                       setFormData({
                         ...formData,
-                        stepUpPercentage: parseFloat(e.target.value) || 0,
+                        stepUpValue: parseFloat(e.target.value) || 0,
                       })
                     }
+                    placeholder="0"
+                    min={formData.stepUpType === "amount" ? "100" : "0"}
+                    max={formData.stepUpType === "amount" ? "50000" : "50"}
+                    step={formData.stepUpType === "amount" ? "100" : "1"}
                     className="w-full px-4 py-2 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none"
                   />
+                  <p className="mt-1 text-xs text-gray-500">
+                    {formData.stepUpType === "percentage"
+                      ? "Your SIP amount will increase by this percentage annually"
+                      : "Your SIP amount will increase by this amount annually"}
+                  </p>
                 </div>
               </div>
             </section>
@@ -976,21 +1021,21 @@ const ProposalEditForm = () => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    Risk Profile
-                  </label>
-                  <input
-                    type="text"
-                    value={strategyDetails?.riskProfile || ""}
-                    readOnly
-                    className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-600 font-semibold"
-                  />
-                </div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Risk Profile
+                    </label>
+                    <input
+                      type="text"
+                      value={strategyDetails?.riskProfile || ""}
+                      readOnly
+                      className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-600 font-semibold"
+                    />
+                  </div>
                   <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
                     <p className="text-sm text-gray-800">
                       <strong>
                         The above allocation is indicative and may change based
-                        on market conditions and investor preference. 
+                        on market conditions and investor preference.
                       </strong>
                     </p>
                   </div>
@@ -1477,18 +1522,13 @@ const ProposalEditForm = () => {
                         (gains / proj.totalInvestment) *
                         100
                       ).toFixed(2);
-                      const cagr = calculateCAGR(
-                        proj.totalInvestment,
-                        proj.probableAmount,
-                        proj.year,
-                      );
+
                       return (
                         <tr
                           key={proj.year}
                           className={
                             index % 2 === 0 ? "bg-white" : "bg-gray-50"
                           }
-                          data-cagr={cagr}
                         >
                           <td className="p-3 text-center font-semibold text-gray-900">
                             {proj.year} Years
@@ -1503,11 +1543,17 @@ const ProposalEditForm = () => {
                             {formatCurrency(proj.probableAmount)}
                           </td>
                           <td className="p-3 text-right">
-                            <div className={`font-semibold ${gains >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {gains >= 0 ? '+' : ''}{formatCurrency(gains)}
+                            <div
+                              className={`font-semibold ${gains >= 0 ? "text-green-600" : "text-red-600"}`}
+                            >
+                              {gains >= 0 ? "+" : ""}
+                              {formatCurrency(gains)}
                             </div>
-                            <div className={`text-xs font-medium ${gains >= 0 ? 'text-green-700' : 'text-red-700'}`}>
-                              ({gains >= 0 ? '+' : ''}{gainPercentage}%)
+                            <div
+                              className={`text-xs font-medium ${gains >= 0 ? "text-green-700" : "text-red-700"}`}
+                            >
+                              ({gains >= 0 ? "+" : ""}
+                              {gainPercentage}%)
                             </div>
                           </td>
                         </tr>
@@ -1528,23 +1574,25 @@ const ProposalEditForm = () => {
                     selectedProjection.projections[
                       selectedProjection.projections.length - 1
                     ];
+
                   const totalGain =
                     horizonProjection.probableAmount -
                     horizonProjection.totalInvestment;
+
                   const totalGainPercentage = (
                     (totalGain / horizonProjection.totalInvestment) *
                     100
                   ).toFixed(2);
-                  const totalCAGR = selectedProjection.projections.reduce((sum, proj) => {
-                    const cagr = calculateCAGR(
-                      proj.totalInvestment,
-                      proj.probableAmount,
-                      proj.year,
-                    );
-                    return sum + cagr;
-                  }, 0);
+
+                  const totalCAGR = calculateCAGR(
+                    horizonProjection.totalInvestment,
+                    horizonProjection.probableAmount,
+                    formData.horizon,
+                  );
+
                   return (
                     <div className="mt-6 grid grid-cols-3 gap-4 mb-4">
+                      {/* --- Total Investment Card --- */}
                       <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-400 rounded-lg p-5">
                         <div className="text-sm font-semibold text-blue-800 mb-2">
                           Total Investment at {formData.horizon} Years
@@ -1556,6 +1604,8 @@ const ProposalEditForm = () => {
                           Lumpsum + SIP contributions
                         </div>
                       </div>
+
+                      {/* --- Probable Value Card --- */}
                       <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-400 rounded-lg p-5">
                         <div className="text-sm font-semibold text-green-800 mb-2">
                           Probable Value at {formData.horizon} Years
@@ -1568,12 +1618,17 @@ const ProposalEditForm = () => {
                           {totalGainPercentage}%)
                         </div>
                       </div>
-                      <div className="bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-400 rounded-lg p-5">
-                        <div className="text-sm font-semibold text-orange-800 mb-2">
+
+                      {/* --- Corrected CAGR Card --- */}
+                      <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-400 rounded-lg p-5">
+                        <div className="text-sm font-semibold text-yellow-800 mb-2">
                           Total CAGR
                         </div>
-                        <div className="text-3xl font-bold text-orange-900">
-                          {totalCAGR.toFixed(2)}%
+                        <div className="text-3xl font-bold text-yellow-900">
+                          {totalCAGR}%
+                        </div>
+                        <div className="text-xs text-yellow-700 mt-1">
+                          Based on Total Invested
                         </div>
                       </div>
                     </div>
@@ -1660,26 +1715,25 @@ const ProposalEditForm = () => {
                 </p>
               </div>
 
-                {/* Founder Card */}
-                <div className="flex justify-center mb-8">
-                  <div className="founder-card-wrapper">
-                    <FounderCard id="proposal-founder-card" pdfSafe={true} />
-                  </div>
+              {/* Founder Card */}
+              <div className="flex justify-center mb-8">
+                <div className="founder-card-wrapper">
+                  <FounderCard id="proposal-founder-card" pdfSafe={true} />
                 </div>
+              </div>
 
-                {/* Disclaimer Text */}
-                <div className="flex justify-center mb-4">
-                  <div className="inline-block px-6 py-3 bg-green-50 rounded-lg">
-                    <p className="text-sm text-gray-800 font-bold">
-                      Availability of products and services is subject to
-                      regulatory approvals and eligibility.
-                    </p>
-                  </div>
+              {/* Disclaimer Text */}
+              <div className="flex justify-center mb-4">
+                <div className="inline-block px-6 py-3 bg-green-50 rounded-lg">
+                  <p className="text-sm text-gray-800 font-bold">
+                    Availability of products and services is subject to
+                    regulatory approvals and eligibility.
+                  </p>
                 </div>
-                <div className="flex justify-center mb-4 text-xl text-green-700 font-semibold">
-                  TrueWise FinSure is a proprietorship concern of Yash Anil Hastak
-                </div>
-
+              </div>
+              <div className="flex justify-center mb-4 text-xl text-green-700 font-semibold">
+                TrueWise FinSure is a proprietorship concern of Yash Anil Hastak
+              </div>
             </section>
 
             {/* Legal Disclaimer - Print Only */}
