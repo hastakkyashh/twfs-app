@@ -408,9 +408,9 @@ const ProposalEditForm = () => {
     setIsGeneratingPDF(true);
 
     try {
-      const riskAppetiteValue = getRiskAppetite(formData.horizon);
       const strategyDetailsValue =
         editableStrategy || formData.selectedStrategyDetails;
+      const riskAppetiteValue = strategyDetailsValue?.riskProfile || getRiskAppetite(formData.horizon);
       const selectedProjectionValue = editableProjections
         ? { projections: editableProjections }
         : formData.selectedProjectionData;
@@ -461,8 +461,8 @@ const ProposalEditForm = () => {
     );
   }
 
-  const riskAppetite = getRiskAppetite(formData.horizon);
   const strategyDetails = editableStrategy || formData.selectedStrategyDetails;
+  const riskAppetite = strategyDetails?.riskProfile || getRiskAppetite(formData.horizon);
   const selectedProjection = editableProjections
     ? { projections: editableProjections }
     : formData.selectedProjectionData;
@@ -1024,12 +1024,27 @@ const ProposalEditForm = () => {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Risk Profile
                     </label>
-                    <input
-                      type="text"
+                    <select
                       value={strategyDetails?.riskProfile || ""}
-                      readOnly
-                      className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg bg-gray-50 text-gray-600 font-semibold"
-                    />
+                      onChange={(e) =>
+                        setEditableStrategy({
+                          ...strategyDetails,
+                          riskProfile: e.target.value,
+                        })
+                      }
+                      className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg bg-white text-gray-700 font-semibold focus:border-blue-500 focus:outline-none cursor-pointer"
+                    >
+                      <option value="" disabled>
+                        Select Risk Profile
+                      </option>
+                      <option value="Very Aggressive">Very Aggressive</option>
+                      <option value="Aggressive">Aggressive</option>
+                      <option value="Moderate">Moderate</option>
+                      <option value="Conservative">Conservative</option>
+                      <option value="Very Conservative">
+                        Very Conservative
+                      </option>
+                    </select>
                   </div>
                   <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
                     <p className="text-sm text-gray-800">
