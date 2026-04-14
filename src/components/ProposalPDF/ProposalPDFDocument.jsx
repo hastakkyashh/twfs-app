@@ -420,6 +420,7 @@ const ProposalPDFDocument = ({
   proposalDate,
   riskAppetite,
   totalAllocation,
+  showTotalCAGR = true,
 }) => {
   const getFormattedPrintDate = () => {
     const today = new Date();
@@ -775,17 +776,19 @@ const ProposalPDFDocument = ({
                     Wealth Gain: +{formatCurrency(totalGain)} ({totalGainPercentage}%)
                   </Text>
                 </View>
-                <View style={[styles.summaryBox, styles.summaryBoxOrange, { marginRight: 0 }]}>
-                  <Text style={[styles.summaryLabel, { color: "#975a16" }]}>
-                    Total CAGR
-                  </Text>
-                  <Text style={[styles.summaryValue, { color: "#975a16" }]}>
-                    {totalCAGR.toFixed(2)}%
-                  </Text>
-                  <Text style={[styles.summarySubtext, { color: "#b7791f" }]}>
-                    Based on Total Invested
-                  </Text>
-                </View>
+                {showTotalCAGR && (
+                  <View style={[styles.summaryBox, styles.summaryBoxOrange, { marginRight: 0 }]}>
+                    <Text style={[styles.summaryLabel, { color: "#975a16" }]}>
+                      Total CAGR
+                    </Text>
+                    <Text style={[styles.summaryValue, { color: "#975a16" }]}>
+                      {totalCAGR.toFixed(2)}%
+                    </Text>
+                    <Text style={[styles.summarySubtext, { color: "#b7791f" }]}>
+                      Based on Total Invested
+                    </Text>
+                  </View>
+                )}
               </View>
             );
           })()}

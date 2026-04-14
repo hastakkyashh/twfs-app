@@ -34,6 +34,7 @@ const ProposalEditForm = () => {
   const [editableStrategy, setEditableStrategy] = useState(null);
   const [editableProjections, setEditableProjections] = useState(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [showTotalCAGR, setShowTotalCAGR] = useState(true);
 
   // Set document title for print job name
   useEffect(() => {
@@ -426,6 +427,7 @@ const ProposalEditForm = () => {
           proposalDate={proposalDate}
           riskAppetite={riskAppetiteValue}
           totalAllocation={totalAllocationValue}
+          showTotalCAGR={showTotalCAGR}
         />
       );
 
@@ -1635,9 +1637,26 @@ const ProposalEditForm = () => {
                       </div>
 
                       {/* --- Corrected CAGR Card --- */}
-                      <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-400 rounded-lg p-5">
+                      <div className={`bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 rounded-lg p-5 relative ${
+                        showTotalCAGR ? "border-yellow-400" : "border-dashed border-yellow-300 opacity-60"
+                      }`}>
+                        {/* Toggle button in card top-right */}
+                        <button
+                          onClick={() => setShowTotalCAGR(!showTotalCAGR)}
+                          title={showTotalCAGR ? "Hide from PDF" : "Show in PDF"}
+                          className={`hide-in-print absolute top-2 right-2 px-2 py-0.5 rounded text-xs font-semibold transition-colors ${
+                            showTotalCAGR
+                              ? "bg-yellow-400 hover:bg-yellow-500 text-yellow-900"
+                              : "bg-gray-300 hover:bg-gray-400 text-gray-700"
+                          }`}
+                        >
+                          {showTotalCAGR ? "Hide from PDF" : "Show in PDF"}
+                        </button>
                         <div className="text-sm font-semibold text-yellow-800 mb-2">
                           Total CAGR
+                          {!showTotalCAGR && (
+                            <span className="hide-in-print ml-2 text-xs font-normal text-gray-400 italic">(hidden in PDF)</span>
+                          )}
                         </div>
                         <div className="text-3xl font-bold text-yellow-900">
                           {totalCAGR}%

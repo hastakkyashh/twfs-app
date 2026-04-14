@@ -201,7 +201,7 @@ const AIAssistantPage = () => {
 
       // 1. ADD LOGO (Top Left)
       const logoImg = new Image();
-      logoImg.src = "/logoTWFS.svg";
+      logoImg.src = "/logoTWFS.png";
       // Wait for logo to load
       await new Promise((resolve, reject) => {
         logoImg.onload = resolve;
