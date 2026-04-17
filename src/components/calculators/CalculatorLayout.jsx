@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend } from 'recharts';
 import { Button } from '../ui';
 import { AlertCircle } from 'lucide-react';
@@ -10,9 +11,12 @@ const CalculatorLayout = ({
   chartData = [],
   disclaimer = "Calculators provide estimates based on assumed rates of return. Actual returns may vary."
 }) => {
+  const navigate = useNavigate();
+
   const handleNavigate = () => {
-    window.location.hash = '#contact';
+    navigate('/contact');
   };
+
   return (
     <div className="bg-white rounded-2xl shadow-xl border border-slate-200 p-8">
       <div className="grid lg:grid-cols-2 gap-12">
